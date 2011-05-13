@@ -9,6 +9,7 @@ from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view, view_management_screens
 from OFS.SimpleItem import SimpleItem
+from OFS.Cache import Cacheable
 
 import sparql
 
@@ -24,12 +25,12 @@ def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     if REQUEST is not None:
         REQUEST.RESPONSE.redirect(parent.absolute_url() + '/manage_workspace')
 
-class ZSPARQLMethod(SimpleItem):
+class ZSPARQLMethod(SimpleItem, Cacheable):
     meta_type = "Z SPARQL Method"
     manage_options = (
         {'label': 'Edit', 'action': 'manage_edit_html'},
         {'label': 'Test', 'action': 'test_html'},
-    ) + SimpleItem.manage_options
+    ) + SimpleItem.manage_options + Cacheable.manage_options
 
     security = ClassSecurityInfo()
 
@@ -63,14 +64,22 @@ class ZSPARQLMethod(SimpleItem):
         self.timeout = timeout
         self.query = REQUEST.form['query']
         self.arg_spec = REQUEST.form['arg_spec']
+        self.ZCacheable_invalidate()
         REQUEST.SESSION['messages'] = ["Saved changes. (%s)" % (datetime.now())]
         REQUEST.RESPONSE.redirect(self.absolute_url() + '/manage_workspace')
 
     security.declareProtected(view, 'execute')
     def execute(self, **arg_values):
         cooked_query = interpolate_query(self.query, arg_values)
-        args = (self.endpoint_url, cooked_query)
-        return run_with_timeout(self.timeout, query_and_get_result, *args)
+        cache_key = {'query': cooked_query}
+        result = self.ZCacheable_get(keywords=cache_key)
+
+        if result is None:
+            args = (self.endpoint_url, cooked_query)
+            result = run_with_timeout(self.timeout, query_and_get_result, *args)
+            self.ZCacheable_set(result, keywords=cache_key)
+
+        return result
 
     # __call__ requires the "View" permission, see __ac_permissions__ above.
     __call__ = execute

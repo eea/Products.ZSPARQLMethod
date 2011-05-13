@@ -6,6 +6,13 @@ import sparql
 
 EIONET_RDF = 'http://rdfdata.eionet.europa.eu/eea'
 
+def _mock_request():
+    mock_request = Mock()
+    mock_request.form = dict((k,'') for k in [
+        'title', 'endpoint_url', 'timeout', 'query', 'arg_spec'])
+    mock_request.SESSION = {}
+    return mock_request
+
 class QueryTest(unittest.TestCase):
     def setUp(self):
         from Products.ZSPARQLMethod.Method import ZSPARQLMethod
@@ -132,3 +139,41 @@ class InterpolateQueryTest(unittest.TestCase):
         self._test(u"SELECT * WHERE { ?s ?p ${value} }",
                    {'value': sparql.Literal("Joe")},
                    u"SELECT * WHERE { ?s ?p 'Joe' }")
+
+class CachingTest(unittest.TestCase):
+
+    def setUp(self):
+        from Products.ZSPARQLMethod.Method import ZSPARQLMethod
+        self.method = ZSPARQLMethod('sq', "Test Method", "_endpoint_")
+        self.method.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
+
+        from Products.StandardCacheManagers.RAMCacheManager import RAMCache
+        self.cache = RAMCache()
+        self.cache.__dict__.update({
+            'threshold': 100, 'cleanup_interval': 300, 'request_vars': ()})
+        self.method.ZCacheable_getCache = Mock(return_value=self.cache)
+        self.method.ZCacheable_setManagerId('_cache_for_test')
+
+    def test_invalidate(self):
+        self.cache.ZCache_invalidate = Mock()
+        self.method.manage_edit(_mock_request())
+        self.cache.ZCache_invalidate.assert_called_once_with(self.method)
+
+    @patch('Products.ZSPARQLMethod.Method.query_and_get_result')
+    def test_cached_queries(self, mock_query):
+        onto_name = EIONET_RDF + '/ontology/name'
+        self.method.query = "SELECT * WHERE {$subject <%s> ?value}" % onto_name
+        self.method.arg_spec = u"subject:iri"
+        mock_query.return_value = {}
+
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/en')
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/da')
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/da')
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/en')
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/fr')
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/fr')
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/fr')
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/fr')
+        self.method.map_and_execute(subject=EIONET_RDF + '/languages/da')
+
+        self.assertEqual(len(mock_query.call_args_list), 3)
