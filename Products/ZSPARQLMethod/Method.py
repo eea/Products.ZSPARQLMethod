@@ -15,7 +15,7 @@ import sparql
 class QueryTimeout(Exception):
     pass
 
-manage_addZSPARQLMethod_html = PageTemplateFile('zpt/query_add.zpt', globals())
+manage_addZSPARQLMethod_html = PageTemplateFile('zpt/method_add.zpt', globals())
 
 def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     """ Create a new ZSPARQLMethod """
@@ -25,7 +25,7 @@ def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
         REQUEST.RESPONSE.redirect(parent.absolute_url() + '/manage_workspace')
 
 class ZSPARQLMethod(SimpleItem):
-    meta_type = "SPARQL Method"
+    meta_type = "Z SPARQL Method"
     manage_options = (
         {'label': 'Edit', 'action': 'manage_edit_html'},
         {'label': 'Test', 'action': 'test_html'},
@@ -38,6 +38,8 @@ class ZSPARQLMethod(SimpleItem):
         ('View', ('__call__','')),
     )
 
+    icon = 'misc_/ZSPARQLMethod/method.gif'
+
     def __init__(self, id, title, endpoint_url):
         super(ZSPARQLMethod, self).__init__()
         self._setId(id)
@@ -48,7 +50,7 @@ class ZSPARQLMethod(SimpleItem):
         self.query = ""
 
     security.declareProtected(view_management_screens, 'manage_edit_html')
-    manage_edit_html = PageTemplateFile('zpt/query_edit.zpt', globals())
+    manage_edit_html = PageTemplateFile('zpt/method_edit.zpt', globals())
 
     security.declareProtected(view_management_screens, 'manage_edit')
     def manage_edit(self, REQUEST):
@@ -73,7 +75,7 @@ class ZSPARQLMethod(SimpleItem):
     # __call__ requires the "View" permission, see __ac_permissions__ above.
     __call__ = execute
 
-    _test_html = PageTemplateFile('zpt/query_test.zpt', globals())
+    _test_html = PageTemplateFile('zpt/method_test.zpt', globals())
 
     def index_html(self, REQUEST=None, **kwargs):
         """
@@ -231,7 +233,7 @@ def html_quote(s):
 
 def interpolate_query_html(query_spec, var_data):
     """
-    Debugging version of interpolate_query. The result is a SPARQL query
+    Debugging version of interpolate_query. The result is a SPARQL method
     that contains HTML markup highlighting where variable substitutions take
     place.
     """

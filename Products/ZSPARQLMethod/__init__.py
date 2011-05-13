@@ -1,4 +1,5 @@
 from AccessControl.Permissions import view_management_screens
+from App.ImageFile import ImageFile
 
 def initialize(context):
     import Method
@@ -9,10 +10,6 @@ def initialize(context):
                       Method.manage_addZSPARQLMethod),
     )
 
-    import ValueBox
-    context.registerClass(
-        ValueBox.ValueBox,
-        permission=view_management_screens,
-        constructors=(ValueBox.manage_addValueBox_html,
-                      ValueBox.manage_addValueBox),
-    )
+misc_ = {
+    'method.gif': ImageFile('www/method.gif', globals()),
+}

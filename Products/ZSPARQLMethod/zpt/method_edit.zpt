@@ -16,7 +16,7 @@
        tal:content="msg"/>
 </tal:block>
 
-<form name="edit-query" action="manage_edit" method="post">
+<form name="edit-method" action="manage_edit" method="post">
 <table border="0" cellspacing="0" cellpadding="2">
 
   <tr>

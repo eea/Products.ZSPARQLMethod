@@ -9,12 +9,12 @@ class BrowserTest(unittest.TestCase):
     def setUp(self):
         from Products.ZSPARQLMethod.Method import ZSPARQLMethod
 
-        self.query = ZSPARQLMethod('sq', "Test Method", "")
-        self.query.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
-        self.query.query = mock_db.GET_LANG_BY_NAME
-        self.query.arg_spec = u"lang_name:string"
+        self.method = ZSPARQLMethod('sq', "Test Method", "")
+        self.method.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
+        self.method.query = mock_db.GET_LANG_BY_NAME
+        self.method.arg_spec = u"lang_name:string"
 
-        self.app = WsgiApp(self.query)
+        self.app = WsgiApp(self.method)
 
         wsgi_intercept.add_wsgi_intercept('test', 80, lambda: self.app)
         self.browser = wsgi_intercept.mechanize_intercept.Browser()
@@ -35,21 +35,21 @@ class BrowserTest(unittest.TestCase):
     def test_manage_edit(self):
         br = self.browser
         br.open('http://test/manage_edit_html')
-        br.select_form(name='edit-query')
-        br['title:utf8:ustring'] = "My awesome query"
+        br.select_form(name='edit-method')
+        br['title:utf8:ustring'] = "My awesome method"
         br['endpoint_url:utf8:ustring'] = "http://dbpedia.org/sparql"
         br['query:utf8:ustring'] = "New query value"
         br['arg_spec:utf8:ustring'] = "confirm:boolean"
         br.submit()
 
-        self.assertEqual(self.query.title, "My awesome query")
-        self.assertEqual(self.query.endpoint_url, "http://dbpedia.org/sparql")
-        self.assertEqual(self.query.query, "New query value")
-        self.assertEqual(self.query.arg_spec, "confirm:boolean")
+        self.assertEqual(self.method.title, "My awesome method")
+        self.assertEqual(self.method.endpoint_url, "http://dbpedia.org/sparql")
+        self.assertEqual(self.method.query, "New query value")
+        self.assertEqual(self.method.arg_spec, "confirm:boolean")
 
     def test_query_test_page(self):
-        self.query.query = mock_db.GET_LANG_NAMES
-        self.query.arg_spec = u""
+        self.method.query = mock_db.GET_LANG_NAMES
+        self.method.arg_spec = u""
         br = self.browser
         page = parse_html(br.open('http://test/test_html').read())
         table = css(page, 'table.sparql-results')[0]
@@ -66,7 +66,7 @@ class BrowserTest(unittest.TestCase):
     def test_with_literal_argument(self):
         br = self.browser
         br.open('http://test/test_html')
-        br.select_form(name='query-arguments')
+        br.select_form(name='method-arguments')
         br['lang_name:utf8:ustring'] = "Danish"
         page = parse_html(br.submit().read())
 
@@ -76,11 +76,11 @@ class BrowserTest(unittest.TestCase):
     def test_autofill_submitted_argument(self):
         br = self.browser
         br.open('http://test/test_html')
-        br.select_form(name='query-arguments')
+        br.select_form(name='method-arguments')
         br['lang_name:utf8:ustring'] = "Danish"
         br.submit()
 
-        br.select_form(name='query-arguments')
+        br.select_form(name='method-arguments')
         self.assertEqual(br['lang_name:utf8:ustring'], "Danish")
 
     def test_REST_query(self):

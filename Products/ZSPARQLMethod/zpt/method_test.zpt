@@ -40,7 +40,7 @@
 </style>
 
 <form tal:condition="options/arg_spec"
-      name="query-arguments" method="get">
+      name="method-arguments" method="get">
   <table>
     <tr tal:repeat="arg options/arg_spec">
       <td class="form-label" tal:content="arg"/>

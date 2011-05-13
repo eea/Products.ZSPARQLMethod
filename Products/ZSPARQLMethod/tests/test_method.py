@@ -9,8 +9,8 @@ EIONET_RDF = 'http://rdfdata.eionet.europa.eu/eea'
 class QueryTest(unittest.TestCase):
     def setUp(self):
         from Products.ZSPARQLMethod.Method import ZSPARQLMethod
-        self.query = ZSPARQLMethod('sq', "Test Method", "_endpoint_")
-        self.query.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
+        self.method = ZSPARQLMethod('sq', "Test Method", "_endpoint_")
+        self.method.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
         self.mock_db = mock_db.MockSparql()
         self.mock_db.start()
 
@@ -19,8 +19,8 @@ class QueryTest(unittest.TestCase):
 
     def test_simple_query(self):
         from sparql import IRI
-        self.query.query = mock_db.GET_LANGS
-        result = self.query.execute()
+        self.method.query = mock_db.GET_LANGS
+        result = self.method.execute()
         self.assertEqual(result.fetchall(), [
             (IRI(EIONET_RDF + '/languages/en'),),
             (IRI(EIONET_RDF + '/languages/de'),),
@@ -29,33 +29,33 @@ class QueryTest(unittest.TestCase):
     @patch('Products.ZSPARQLMethod.Method.threading')
     def test_timeout(self, mock_threading):
         from Products.ZSPARQLMethod.Method import QueryTimeout
-        self.query.query = mock_db.GET_LANGS
+        self.method.query = mock_db.GET_LANGS
         mock_threading.Thread.return_value.isAlive.return_value = True
 
-        self.assertRaises(QueryTimeout, self.query.execute)
+        self.assertRaises(QueryTimeout, self.method.execute)
 
     @patch('Products.ZSPARQLMethod.Method.sparql')
     def test_error(self, mock_sparql):
-        self.query.query = mock_db.GET_LANGS
+        self.method.query = mock_db.GET_LANGS
         class MyError(Exception): pass
         mock_sparql.query.side_effect = MyError
 
-        self.assertRaises(MyError, self.query.execute)
+        self.assertRaises(MyError, self.method.execute)
 
     def test_query_with_arguments(self):
-        self.query.query = mock_db.GET_LANG_BY_NAME
-        result = self.query.execute(lang_name=sparql.Literal("Danish"))
+        self.method.query = mock_db.GET_LANG_BY_NAME
+        result = self.method.execute(lang_name=sparql.Literal("Danish"))
 
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
         self.assertEqual(list(result), [(danish_iri,)])
 
     def test_call(self):
-        self.assertEqual(self.query.execute, self.query.__call__)
+        self.assertEqual(self.method.execute, self.method.__call__)
 
     def test_map_and_execute(self):
-        self.query.query = mock_db.GET_LANG_BY_NAME
-        self.query.arg_spec = u"lang_name:n3term"
-        result = self.query.map_and_execute(lang_name='"Danish"')
+        self.method.query = mock_db.GET_LANG_BY_NAME
+        self.method.arg_spec = u"lang_name:n3term"
+        result = self.method.map_and_execute(lang_name='"Danish"')
 
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
         self.assertEqual(list(result), [(danish_iri,)])

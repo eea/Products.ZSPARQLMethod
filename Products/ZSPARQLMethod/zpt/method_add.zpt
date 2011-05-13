@@ -1,11 +1,11 @@
 <span tal:replace="structure here/manage_page_header" />
-<span tal:replace="structure python:here.manage_form_title(here, here, form_title='Add SPARQL Query')" />
+<span tal:replace="structure python:here.manage_form_title(here, here, form_title='Add Z SPARQL Method')" />
 
 <p class="form-help">
   Please fill the form below and click <strong>Add</strong>.
 </p>
 
-<form action="manage_addSPARQLQuery" method="post">
+<form action="manage_addZSPARQLMethod" method="post">
 <table border="0" cellspacing="0" cellpadding="2" width="100%">
 
   <tr>
