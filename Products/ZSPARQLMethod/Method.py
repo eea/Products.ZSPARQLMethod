@@ -70,7 +70,7 @@ class ZSPARQLMethod(SimpleItem):
     def execute(self, **arg_values):
         cooked_query = interpolate_query(self.query, arg_values)
         args = (self.endpoint_url, cooked_query)
-        return run_with_timeout(self.timeout, sparql.query, *args)
+        return run_with_timeout(self.timeout, query_and_get_result, *args)
 
     # __call__ requires the "View" permission, see __ac_permissions__ above.
     __call__ = execute
@@ -92,10 +92,9 @@ class ZSPARQLMethod(SimpleItem):
         arg_values = self.map_arguments(**kwargs)
         result = self.execute(**arg_values)
 
-        response = {'data': list(result)}
         if REQUEST is not None:
             REQUEST.RESPONSE.setHeader('Content-Type', 'application/json')
-        return json.dumps(response, default=rdf_values_to_json)
+        return json.dumps(result, default=rdf_values_to_json)
 
     security.declareProtected(view, 'map_arguments')
     def map_arguments(self, **kwargs):
@@ -135,18 +134,12 @@ class ZSPARQLMethod(SimpleItem):
             t0 = time()
 
             try:
-                result = self.execute(**arg_values)
+                data = self.execute(**arg_values)
 
             except Exception, e:
                 import traceback
                 error = traceback.format_exc()
                 data = None
-
-            else:
-                data = {
-                    'var_names': [unicode(name) for name in result.variables],
-                    'rows': result.fetchall(),
-                }
 
             dt = time() - t0
 
@@ -161,6 +154,13 @@ class ZSPARQLMethod(SimpleItem):
 
 InitializeClass(ZSPARQLMethod)
 
+
+def query_and_get_result(*args):
+    result = sparql.query(*args)
+    return {
+        'var_names': [unicode(name) for name in result.variables],
+        'rows': result.fetchall(),
+    }
 
 def run_with_timeout(timeout, func, *args, **kwargs):
     """

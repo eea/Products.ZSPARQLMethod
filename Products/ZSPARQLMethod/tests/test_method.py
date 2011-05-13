@@ -21,7 +21,7 @@ class QueryTest(unittest.TestCase):
         from sparql import IRI
         self.method.query = mock_db.GET_LANGS
         result = self.method.execute()
-        self.assertEqual(result.fetchall(), [
+        self.assertEqual(result['rows'], [
             (IRI(EIONET_RDF + '/languages/en'),),
             (IRI(EIONET_RDF + '/languages/de'),),
         ])
@@ -47,7 +47,7 @@ class QueryTest(unittest.TestCase):
         result = self.method.execute(lang_name=sparql.Literal("Danish"))
 
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
-        self.assertEqual(list(result), [(danish_iri,)])
+        self.assertEqual(result['rows'], [(danish_iri,)])
 
     def test_call(self):
         self.assertEqual(self.method.execute, self.method.__call__)
@@ -58,7 +58,7 @@ class QueryTest(unittest.TestCase):
         result = self.method.map_and_execute(lang_name='"Danish"')
 
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
-        self.assertEqual(list(result), [(danish_iri,)])
+        self.assertEqual(result['rows'], [(danish_iri,)])
 
 
 class MapArgumentsTest(unittest.TestCase):

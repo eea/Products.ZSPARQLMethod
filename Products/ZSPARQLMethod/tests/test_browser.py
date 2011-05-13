@@ -95,4 +95,4 @@ class BrowserTest(unittest.TestCase):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_response = json.loads(response.body)
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
-        self.assertEqual(json_response['data'], [[danish_iri.n3()]])
+        self.assertEqual(json_response['rows'], [[danish_iri.n3()]])
