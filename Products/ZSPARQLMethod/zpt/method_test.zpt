@@ -33,6 +33,11 @@
     color: #a50;
   }
 
+  p.sparql-has-result .boolean {
+    font-weight: bold;
+    color: #a50;
+  }
+
   .sparql-error {
     white-space: pre;
     border: 2px solid #f00;
@@ -80,6 +85,15 @@
     </tr>
   </tbody>
 </table>
+
+<p class="sparql-has-result"
+   tal:define="has_result options/data/has_result|nothing"
+   tal:condition="python: has_result is not None">
+  Query
+  <span class="boolean">will<tal:block condition="not:has_result">
+    not</tal:block></span>
+  return a result.
+</p>
 
 <blockquote class="sparql-error"
             tal:condition="options/error|nothing"

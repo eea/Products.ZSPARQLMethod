@@ -160,6 +160,7 @@ def query_and_get_result(*args):
     return {
         'var_names': [unicode(name) for name in result.variables],
         'rows': result.fetchall(),
+        'has_result': result._hasResult,
     }
 
 def run_with_timeout(timeout, func, *args, **kwargs):
