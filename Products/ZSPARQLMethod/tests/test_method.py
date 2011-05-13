@@ -1,0 +1,134 @@
+import unittest
+from mock import Mock, patch
+import mock_db
+
+import sparql
+
+EIONET_RDF = 'http://rdfdata.eionet.europa.eu/eea'
+
+class QueryTest(unittest.TestCase):
+    def setUp(self):
+        from Products.ZSPARQLMethod.Method import ZSPARQLMethod
+        self.query = ZSPARQLMethod('sq', "Test Method", "_endpoint_")
+        self.query.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
+        self.mock_db = mock_db.MockSparql()
+        self.mock_db.start()
+
+    def tearDown(self):
+        self.mock_db.stop()
+
+    def test_simple_query(self):
+        from sparql import IRI
+        self.query.query = mock_db.GET_LANGS
+        result = self.query.execute()
+        self.assertEqual(result.fetchall(), [
+            (IRI(EIONET_RDF + '/languages/en'),),
+            (IRI(EIONET_RDF + '/languages/de'),),
+        ])
+
+    @patch('Products.ZSPARQLMethod.Method.threading')
+    def test_timeout(self, mock_threading):
+        from Products.ZSPARQLMethod.Method import QueryTimeout
+        self.query.query = mock_db.GET_LANGS
+        mock_threading.Thread.return_value.isAlive.return_value = True
+
+        self.assertRaises(QueryTimeout, self.query.execute)
+
+    @patch('Products.ZSPARQLMethod.Method.sparql')
+    def test_error(self, mock_sparql):
+        self.query.query = mock_db.GET_LANGS
+        class MyError(Exception): pass
+        mock_sparql.query.side_effect = MyError
+
+        self.assertRaises(MyError, self.query.execute)
+
+    def test_query_with_arguments(self):
+        self.query.query = mock_db.GET_LANG_BY_NAME
+        result = self.query.execute(lang_name=sparql.Literal("Danish"))
+
+        danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
+        self.assertEqual(list(result), [(danish_iri,)])
+
+    def test_call(self):
+        self.assertEqual(self.query.execute, self.query.__call__)
+
+    def test_map_and_execute(self):
+        self.query.query = mock_db.GET_LANG_BY_NAME
+        self.query.arg_spec = u"lang_name:n3term"
+        result = self.query.map_and_execute(lang_name='"Danish"')
+
+        danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
+        self.assertEqual(list(result), [(danish_iri,)])
+
+
+class MapArgumentsTest(unittest.TestCase):
+
+    def _test(self, raw_arg_spec, arg_data, expected):
+        from Products.ZSPARQLMethod.Method import map_arg_values, parse_arg_spec
+        missing, result = map_arg_values(parse_arg_spec(raw_arg_spec), arg_data)
+        self.assertEqual(missing, [])
+        self.assertEqual(result, expected)
+        self.assertEqual(map(type, result.values()),
+                         map(type, expected.values()))
+
+    def test_map_zero(self):
+        self._test(u'', (), {})
+
+    def test_map_one_iri(self):
+        en = EIONET_RDF + '/languages/en'
+        self._test(u'lang_url:iri',
+                   {'lang_url': en},
+                   {'lang_url': sparql.IRI(en)})
+
+    def test_map_one_parsed_iri(self):
+        en = EIONET_RDF + '/languages/en'
+        self._test(u'lang_url:n3term',
+                   {'lang_url': '<%s>' % en},
+                   {'lang_url': sparql.IRI(en)})
+
+    def test_map_one_literal(self):
+        self._test(u'name:string',
+                   {'name': u"Joe"},
+                   {'name': sparql.Literal(u"Joe")})
+
+    def test_map_one_float(self):
+        en = EIONET_RDF + '/languages/en'
+        self._test(u'lang_url:float',
+                   {'lang_url': '1.23'},
+                   {'lang_url': sparql.Literal('1.23', sparql.XSD_FLOAT)})
+
+    def test_map_one_parsed_typed_literal(self):
+        en = EIONET_RDF + '/languages/en'
+        self._test(u'lang_url:n3term',
+                   {'lang_url': '"12:33"^^'+sparql.XSD_TIME},
+                   {'lang_url': sparql.Literal('12:33', sparql.XSD_TIME)})
+
+    def test_map_two_values(self):
+        en = EIONET_RDF + '/languages/en'
+        self._test(u'name:string lang_url:n3term',
+                   {'name': u"Joe", 'lang_url': '<%s>' % en},
+                   {'name': sparql.Literal(u"Joe"),
+                    'lang_url': sparql.IRI(en)})
+
+class InterpolateQueryTest(unittest.TestCase):
+
+    def _test(self, query_spec, var_data, expected):
+        from Products.ZSPARQLMethod.Method import interpolate_query
+        result = interpolate_query(query_spec, var_data)
+        self.assertEqual(result, expected)
+
+    def test_no_variables(self):
+        self._test(u"SELECT * WHERE { ?s ?p ?u }",
+                   {},
+                   u"SELECT * WHERE { ?s ?p ?u }")
+
+    def test_one_iri(self):
+        onto_name = EIONET_RDF + '/ontology/name'
+        self._test(u"SELECT * WHERE { ?s ${pred} 'Joe' }",
+                   {'pred': sparql.IRI(onto_name)},
+                   u"SELECT * WHERE { ?s <%s> 'Joe' }" % onto_name)
+
+    def test_one_literal(self):
+        self._test(u"SELECT * WHERE { ?s ?p ${value} }",
+                   {'value': sparql.Literal("Joe")},
+                   u"SELECT * WHERE { ?s ?p 'Joe' }")
