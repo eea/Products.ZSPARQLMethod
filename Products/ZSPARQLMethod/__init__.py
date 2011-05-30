@@ -1,7 +1,12 @@
-from AccessControl.Permissions import view_management_screens
+import Globals
 from App.ImageFile import ImageFile
 
+misc_ = {
+    'method.gif': ImageFile('www/method.gif', globals()),
+}
+
 def initialize(context):
+    from AccessControl.Permissions import view_management_screens
     import Method
     context.registerClass(
         Method.ZSPARQLMethod,
@@ -9,7 +14,3 @@ def initialize(context):
         constructors=(Method.manage_addZSPARQLMethod_html,
                       Method.manage_addZSPARQLMethod),
     )
-
-misc_ = {
-    'method.gif': ImageFile('www/method.gif', globals()),
-}
