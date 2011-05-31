@@ -81,9 +81,6 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
 
         return result
 
-    # __call__ requires the "View" permission, see __ac_permissions__ above.
-    __call__ = execute
-
     _test_html = PageTemplateFile('zpt/method_test.zpt', globals())
 
     def index_html(self, REQUEST=None, **kwargs):
@@ -160,6 +157,9 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
             'error': error,
         }
         return self._test_html(REQUEST, **options)
+
+    # __call__ requires the "View" permission, see __ac_permissions__ above.
+    __call__ = map_and_execute
 
 InitializeClass(ZSPARQLMethod)
 
