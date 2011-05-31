@@ -6,6 +6,9 @@ similar to `ZSQLMethod`. You create an instance, configure its `id` and
 `title`, write a query template and specify arguments. Afterwards the method
 can be called from a Python script, page template, or even as a REST service.
 
+
+.. _zsparqlmethod-properties:
+
 Properties of a ZSPARQLMethod
 -----------------------------
 
@@ -22,26 +25,8 @@ Timeout
     finally gets a response.
 
 Arguments
-    A space-separated list of arguments that will be interpolated into the
-    query template. An argument is specified as ``<name>:<type>`` where `type`
-    is one of the following:
-
-    ============    ==================================
-    Type            Meaning
-    ============    ==================================
-    ``n3term``      parse the value assuming N3 syntax
-    ``iri``         IRI
-    ``string``      plain literal
-    ``integer``     typed literal, XSD_INTEGER
-    ``long``        typed literal, XSD_LONG
-    ``double``      typed literal, XSD_DOUBLE
-    ``float``       typed literal, XSD_FLOAT
-    ``decimal``     typed literal, XSD_DECIMAL
-    ``datetime``    typed literal, XSD_DATETIME
-    ``date``        typed literal, XSD_DATE
-    ``time``        typed literal, XSD_TIME
-    ``boolean``     typed literal, XSD_BOOLEAN
-    ============    ==================================
+    Definition of the arguments this method expects to receive. It will be
+    parsed using :py:func:`.parse_arg_spec`.
 
 Query
     The SPARQL query template, processed using `string.Template`_ from the
@@ -49,6 +34,19 @@ Query
 
 .. _SparqlImplementations: http://www.w3.org/wiki/SparqlImplementations#Query_Engines
 .. _`string.Template`: http://docs.python.org/library/string#template-strings
+
+
+Caching
+-------
+
+ZSPARQLMethod implements the ZCacheable_ protocol, so caching of query results
+is easy: create a cache manager, then configure the ZSPARQLMethod instance to
+use the cache. This is done from the `Cache` ZMI tab.
+
+.. _ZCacheable: http://docs.zope.org/zope2/zope2book/ZopeServices.html#caching-services
+
+The cache is invalidated whenever the ZSPARQLMethod object is edited. Cache
+keys are calculated based on the arguments received.
 
 
 Tutorial

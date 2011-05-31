@@ -26,6 +26,10 @@ def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
         REQUEST.RESPONSE.redirect(parent.absolute_url() + '/manage_workspace')
 
 class ZSPARQLMethod(SimpleItem, Cacheable):
+    """
+    Persistent SPARQL parametrized query.
+    """
+
     meta_type = "Z SPARQL Method"
     manage_options = (
         {'label': 'Edit', 'action': 'manage_edit_html'},
@@ -70,6 +74,10 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
 
     security.declareProtected(view, 'execute')
     def execute(self, **arg_values):
+        """
+        Execute the query and return values in the format specified by
+        :py:func:`.query_and_get_result`.
+        """
         cooked_query = interpolate_query(self.query, arg_values)
         cache_key = {'query': cooked_query}
         result = self.ZCacheable_get(keywords=cache_key)
@@ -116,8 +124,8 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
     def map_and_execute(self, **kwargs):
         """
         Map the given arguments to our arg_spec and execute the query.
-        `query.map_and_execute(**data)` is exactly equivalent to
-        `query.execute(**query.map_arguments(**data))`.
+        ``query.map_and_execute(**data)`` is exactly equivalent to
+        ``query.execute(**query.map_arguments(**data))``.
         """
         return self.execute(**self.map_arguments(**kwargs))
 
@@ -165,6 +173,22 @@ InitializeClass(ZSPARQLMethod)
 
 
 def query_and_get_result(*args):
+    """
+    Helper function that calls `sparql.query` with the given arguments and
+    unpacks its return value as a dictionary. The dictionary has three keys:
+
+    var_names
+        A list of the requested query variables.
+
+    rows
+        The complete result set. We avoid streaming because our return value
+        may end up being cached.
+
+    has_result
+        If the query was `ASK`, `has_result` is a boolean, indicating whether
+        the query would return any rows. Otherwise it's `None`.
+
+    """
     result = sparql.query(*args)
     return {
         'var_names': [unicode(name) for name in result.variables],
@@ -175,7 +199,9 @@ def query_and_get_result(*args):
 def run_with_timeout(timeout, func, *args, **kwargs):
     """
     Run the given callable in a separate thread; if it does not return within
-    `timeout` seconds, ignore the result and raise `QueryTimeout`.
+    `timeout` seconds, ignore the result and raise `QueryTimeout`. The thread
+    will keep running until either the socket times out or a result is
+    received.
     """
 
     result = {}
@@ -215,6 +241,28 @@ RDF_TERM_FACTORY = {
 }
 
 def parse_arg_spec(raw_arg_spec):
+    """
+    Parse the arguments for a ZSPARQLMethod. `raw_arg_spec` should be a
+    space-separated string of variable definitions in the format
+    ``<name>:<type>`` where `type` is one of the following:
+
+    ============    ==================================
+    Type            Meaning
+    ============    ==================================
+    ``n3term``      parse the value assuming N3 syntax
+    ``iri``         IRI
+    ``string``      plain literal
+    ``integer``     typed literal, XSD_INTEGER
+    ``long``        typed literal, XSD_LONG
+    ``double``      typed literal, XSD_DOUBLE
+    ``float``       typed literal, XSD_FLOAT
+    ``decimal``     typed literal, XSD_DECIMAL
+    ``datetime``    typed literal, XSD_DATETIME
+    ``date``        typed literal, XSD_DATE
+    ``time``        typed literal, XSD_TIME
+    ``boolean``     typed literal, XSD_BOOLEAN
+    ============    ==================================
+    """
     arg_spec = {}
     for one_arg_spec in raw_arg_spec.split():
         name, type_spec = one_arg_spec.split(':')
@@ -222,10 +270,14 @@ def parse_arg_spec(raw_arg_spec):
         arg_spec[str(name)] = factory
     return arg_spec
 
-def map_arg_values(raw_arg_spec, arg_data):
+def map_arg_values(arg_spec, arg_data):
+    """
+    Box all values in `arg_data` according to `arg_spec`. Returns a tuple
+    of (`missing`, `arg_values`).
+    """
     arg_values = {}
     missing = []
-    for name, factory in raw_arg_spec.iteritems():
+    for name, factory in arg_spec.iteritems():
         if name in arg_data:
             arg_values[name] = factory(arg_data[name])
         else:
@@ -234,6 +286,11 @@ def map_arg_values(raw_arg_spec, arg_data):
     return missing, arg_values
 
 def interpolate_query(query_spec, var_data):
+    """
+    Parse the given query using `string.Template`, then perform variable
+    substitution. `var_data` should be a dictionary, keyed with the template's
+    variables, and its values are assumed to be `sparql.RDFTerm` instances.
+    """
     from string import Template
     var_strings = dict( (k, v.n3()) for (k, v) in var_data.iteritems() )
     return Template(query_spec).substitute(**var_strings)
