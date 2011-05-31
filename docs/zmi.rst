@@ -49,6 +49,8 @@ The cache is invalidated whenever the ZSPARQLMethod object is edited. Cache
 keys are calculated based on the arguments received.
 
 
+.. _tutorial:
+
 Tutorial
 --------
 
