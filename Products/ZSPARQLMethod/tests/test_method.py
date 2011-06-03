@@ -112,7 +112,7 @@ class MapArgumentsTest(unittest.TestCase):
     def test_map_one_parsed_typed_literal(self):
         en = EIONET_RDF + '/languages/en'
         self._test(u'lang_url:n3term',
-                   {'lang_url': '"12:33"^^'+sparql.XSD_TIME},
+                   {'lang_url': '"12:33"^^<'+sparql.XSD_TIME+'>'},
                    {'lang_url': sparql.Literal('12:33', sparql.XSD_TIME)})
 
     def test_map_two_values(self):
