@@ -1,9 +1,11 @@
-import Globals
-from App.ImageFile import ImageFile
+__version__ = '0.3'
 
-misc_ = {
-    'method.gif': ImageFile('www/method.gif', globals()),
-}
+try:
+    import Globals
+    from App.ImageFile import ImageFile
+    misc_ = {'method.gif': ImageFile('www/method.gif', globals())}
+except ImportError:
+    pass
 
 def initialize(context):
     from AccessControl.Permissions import view_management_screens

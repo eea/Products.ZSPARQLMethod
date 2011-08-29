@@ -1,13 +1,15 @@
 from setuptools import setup, find_packages
 import sys
 
+from Products.ZSPARQLMethod import __version__ as version
+
 install_requires = ['sparql-client']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
 setup(
     name='Products.ZSPARQLMethod',
-    version='0.3',
+    version=version,
     author='Eau de Web',
     author_email='office@eaudeweb.ro',
     license="Mozilla Public License 1.1",
