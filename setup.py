@@ -7,6 +7,8 @@ install_requires = ['sparql-client']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
+docs = open('README.rst').read() + "\n\n" + open('CHANGES.rst').read()
+
 setup(
     name='Products.ZSPARQLMethod',
     version=version,
@@ -25,6 +27,7 @@ setup(
         'Topic :: Software Development :: Libraries',
     ],
     description="Zope product for making SPARQL queries, simiar to ZSQLMethod",
+    long_description=docs,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
