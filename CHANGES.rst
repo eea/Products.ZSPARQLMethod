@@ -5,6 +5,7 @@ Changelog
 ----------------
 
 * Look for `ZSPARQLMETHOD_DEFAULT_ENDPOINT` when creating a method [moregale]
+* Remove the `map_and_execute` method because `__call__` is enough [moregale]
 
 0.3 (2011-05-31)
 ----------------

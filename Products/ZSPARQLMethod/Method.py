@@ -123,15 +123,6 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         else:
             return arg_values
 
-    security.declareProtected(view, 'map_and_execute')
-    def map_and_execute(self, **kwargs):
-        """
-        Map the given arguments to our arg_spec and execute the query.
-        ``query.map_and_execute(**data)`` is exactly equivalent to
-        ``query.execute(**query.map_arguments(**data))``.
-        """
-        return self.execute(**self.map_arguments(**kwargs))
-
     security.declareProtected(view, 'test_html')
     def test_html(self, REQUEST):
         """
@@ -170,7 +161,13 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         return self._test_html(REQUEST, **options)
 
     # __call__ requires the "View" permission, see __ac_permissions__ above.
-    __call__ = map_and_execute
+    def __call__(self, **kwargs):
+        """
+        Map the given arguments to our arg_spec and execute the query.
+        ``query(**data)`` is exactly equivalent to
+        ``query.execute(**query.map_arguments(**data))``.
+        """
+        return self.execute(**self.map_arguments(**kwargs))
 
 InitializeClass(ZSPARQLMethod)
 

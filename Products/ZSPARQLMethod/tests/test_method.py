@@ -64,14 +64,6 @@ class QueryTest(unittest.TestCase):
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
         self.assertEqual(result['rows'], [(danish_iri,)])
 
-    def test_map_and_execute(self):
-        self.method.query = mock_db.GET_LANG_BY_NAME
-        self.method.arg_spec = u"lang_name:n3term"
-        result = self.method.map_and_execute(lang_name='"Danish"')
-
-        danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
-        self.assertEqual(result['rows'], [(danish_iri,)])
-
 
 class MapArgumentsTest(unittest.TestCase):
 
@@ -171,14 +163,14 @@ class CachingTest(unittest.TestCase):
         self.method.arg_spec = u"subject:iri"
         mock_query.return_value = {}
 
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/en')
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/da')
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/da')
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/en')
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/fr')
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/fr')
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/fr')
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/fr')
-        self.method.map_and_execute(subject=EIONET_RDF + '/languages/da')
+        self.method(subject=EIONET_RDF + '/languages/en')
+        self.method(subject=EIONET_RDF + '/languages/da')
+        self.method(subject=EIONET_RDF + '/languages/da')
+        self.method(subject=EIONET_RDF + '/languages/en')
+        self.method(subject=EIONET_RDF + '/languages/fr')
+        self.method(subject=EIONET_RDF + '/languages/fr')
+        self.method(subject=EIONET_RDF + '/languages/fr')
+        self.method(subject=EIONET_RDF + '/languages/fr')
+        self.method(subject=EIONET_RDF + '/languages/da')
 
         self.assertEqual(len(mock_query.call_args_list), 3)
