@@ -10,11 +10,19 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view, view_management_screens
 from OFS.SimpleItem import SimpleItem
 from OFS.Cache import Cacheable
+import DateTime
 
 import sparql
 
 class QueryTimeout(Exception):
     pass
+
+
+sparql_converters = {
+    sparql.XSD_DATE: DateTime.DateTime,
+    sparql.XSD_DATETIME: DateTime.DateTime,
+}
+
 
 manage_addZSPARQLMethod_html = PageTemplateFile('zpt/method_add.zpt', globals())
 
@@ -164,10 +172,9 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
     def __call__(self, **kwargs):
         """
         Map the given arguments to our arg_spec and execute the query.
-        ``query(**data)`` is exactly equivalent to
-        ``query.execute(**query.map_arguments(**data))``.
+        Returns a :class:`MethodResult` object.
         """
-        return self.execute(**self.map_arguments(**kwargs))
+        return MethodResult(self.execute(**self.map_arguments(**kwargs)))
 
 InitializeClass(ZSPARQLMethod)
 
@@ -175,19 +182,7 @@ InitializeClass(ZSPARQLMethod)
 def query_and_get_result(*args):
     """
     Helper function that calls `sparql.query` with the given arguments and
-    unpacks its return value as a dictionary. The dictionary has three keys:
-
-    var_names
-        A list of the requested query variables.
-
-    rows
-        The complete result set. We avoid streaming because our return value
-        may end up being cached.
-
-    has_result
-        If the query was `ASK`, `has_result` is a boolean, indicating whether
-        the query would return any rows. Otherwise it's `None`.
-
+    returns its results as an easy-to-cache dictionary.
     """
     result = sparql.query(*args)
     return {
@@ -195,6 +190,47 @@ def query_and_get_result(*args):
         'rows': result.fetchall(),
         'has_result': result._hasResult,
     }
+
+
+class MethodResult(object):
+    """
+    MethodResult Encapsulates a query result. It provides convenient
+    access to unpacked pythonic values instead of raw `RDFTerm` objects.
+    You can iterate through it like a list. Also, the following
+    properties are available:
+
+    `var_names`
+        A list of the requested query variables.
+
+    `has_result`
+        If the query was `ASK`, `has_result` is a boolean, indicating
+        whether the query would return any rows. Otherwise it's `None`.
+
+    `rdfterm_rows`
+        Original `RDFTerm` values returned by the SPARQL query.
+
+    """
+
+    __allow_access_to_unprotected_subobjects__ = {'rdfterm_rows': 1,
+        'var_names': 1, 'has_result': 1, '__iter__': 1, '__getitem__': 1}
+
+    def __init__(self, result_dict):
+        self.var_names = result_dict['var_names']
+        self.rdfterm_rows = result_dict['rows']
+        self.has_result = result_dict['has_result']
+
+    def __iter__(self):
+        return (sparql.unpack_row(r, convert_type=sparql_converters)
+                for r in self.rdfterm_rows)
+
+    def __getitem__(self, n):
+        return sparql.unpack_row(self.rdfterm_rows[n],
+                                 convert_type=sparql_converters)
+
+    def __len__(self):
+        return len(self.rdfterm_rows)
+
+
 
 def run_with_timeout(timeout, func, *args, **kwargs):
     """

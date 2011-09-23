@@ -19,6 +19,8 @@ The ZSPARQLMethod class
 .. autoclass:: Products.ZSPARQLMethod.Method.ZSPARQLMethod
     :members: __call__, index_html, test_html, map_arguments, execute
 
+.. autoclass:: Products.ZSPARQLMethod.Method.MethodResult
+
 
 :py:mod:`Products.ZSPARQLMethod.Method` module
 ----------------------------------------------

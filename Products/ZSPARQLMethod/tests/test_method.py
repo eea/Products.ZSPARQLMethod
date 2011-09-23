@@ -5,6 +5,7 @@ import mock_db
 import sparql
 
 EIONET_RDF = 'http://rdfdata.eionet.europa.eu/eea'
+SPARQL_URL = "http://cr3.eionet.europa.eu/sparql"
 
 def _mock_request():
     mock_request = Mock()
@@ -13,11 +14,19 @@ def _mock_request():
     mock_request.SESSION = {}
     return mock_request
 
+class SimpleMockResult(object):
+    def __init__(self, variables, rows):
+        self.variables = variables
+        self.rows = rows
+        self._hasResult = True
+
+    def fetchall(self):
+        return self.rows
+
 class QueryTest(unittest.TestCase):
     def setUp(self):
         from Products.ZSPARQLMethod.Method import ZSPARQLMethod
-        self.method = ZSPARQLMethod('sq', "Test Method", "_endpoint_")
-        self.method.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
+        self.method = ZSPARQLMethod('sq', "Test Method", SPARQL_URL)
         self.mock_db = mock_db.MockSparql()
         self.mock_db.start()
 
@@ -61,8 +70,7 @@ class QueryTest(unittest.TestCase):
         self.method.arg_spec = u"lang_name:n3term"
         result = self.method(lang_name='"Danish"')
 
-        danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
-        self.assertEqual(result['rows'], [(danish_iri,)])
+        self.assertEqual(result[0], [EIONET_RDF+'/languages/da'])
 
 
 class MapArgumentsTest(unittest.TestCase):
@@ -141,8 +149,7 @@ class CachingTest(unittest.TestCase):
 
     def setUp(self):
         from Products.ZSPARQLMethod.Method import ZSPARQLMethod
-        self.method = ZSPARQLMethod('sq', "Test Method", "_endpoint_")
-        self.method.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
+        self.method = ZSPARQLMethod('sq', "Test Method", SPARQL_URL)
 
         from Products.StandardCacheManagers.RAMCacheManager import RAMCache
         self.cache = RAMCache()
@@ -161,7 +168,8 @@ class CachingTest(unittest.TestCase):
         onto_name = EIONET_RDF + '/ontology/name'
         self.method.query = "SELECT * WHERE {$subject <%s> ?value}" % onto_name
         self.method.arg_spec = u"subject:iri"
-        mock_query.return_value = {}
+        mock_query.return_value = {
+            'rows': [], 'var_names': [], 'has_result': True}
 
         self.method(subject=EIONET_RDF + '/languages/en')
         self.method(subject=EIONET_RDF + '/languages/da')
@@ -174,3 +182,58 @@ class CachingTest(unittest.TestCase):
         self.method(subject=EIONET_RDF + '/languages/da')
 
         self.assertEqual(len(mock_query.call_args_list), 3)
+
+
+class ResultsUnpackingTest(unittest.TestCase):
+
+    def setUp(self):
+        from Products.ZSPARQLMethod.Method import ZSPARQLMethod
+        self.method = ZSPARQLMethod('sq', "Test Method", SPARQL_URL)
+        self.method.query = "SELECT ?o WHERE {?s ?p ?o}"
+
+    @patch('Products.ZSPARQLMethod.Method.sparql')
+    def do_query(self, sparql_result, mock_sparql):
+        mock_sparql.unpack_row = sparql.unpack_row
+        mock_sparql.query.return_value = SimpleMockResult(['o'], sparql_result)
+        return self.method()
+
+    def test_var_names(self):
+        result = self.do_query([ [sparql.Literal("hello")] ])
+        self.assertEqual(result.var_names, ["o"])
+
+    def test_getitem(self):
+        result = self.do_query([ [sparql.Literal("hello")] ])
+        self.assertEqual(result[0][0], "hello")
+
+    def test_iter(self):
+        result = self.do_query([ [sparql.Literal("hello")] ])
+        self.assertEqual(iter(result).next()[0], "hello")
+
+    def test_length(self):
+        result = self.do_query([
+            [sparql.Literal("tomato")],
+            [sparql.Literal("apple")],
+        ])
+        self.assertEqual(len(result), 2)
+
+    def test_float(self):
+        result = self.do_query([
+            [sparql.Literal("13.5", sparql.XSD_FLOAT)],
+        ])
+
+        value0 = result[0][0]
+        self.assertEqual(value0, 13.5)
+        self.assertTrue(isinstance(value0, float))
+
+    def test_dates_times(self):
+        from DateTime import DateTime
+        result = self.do_query([
+            [sparql.Literal("2009-11-02", sparql.XSD_DATE)],
+            [sparql.Literal("2009-11-02 14:31:40", sparql.XSD_DATETIME)],
+        ])
+
+        date_value = result[0][0]
+        self.assertEqual(date_value, DateTime("2009-11-02"))
+
+        datetime_value = result[1][0]
+        self.assertEqual(datetime_value, DateTime("2009-11-02 14:31:40"))
