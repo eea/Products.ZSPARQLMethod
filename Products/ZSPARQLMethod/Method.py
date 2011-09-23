@@ -20,6 +20,9 @@ manage_addZSPARQLMethod_html = PageTemplateFile('zpt/method_add.zpt', globals())
 
 def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     """ Create a new ZSPARQLMethod """
+    if not endpoint_url:
+        endpoint_url = getattr(parent, 'ZSPARQLMETHOD_DEFAULT_ENDPOINT', "")
+
     ob = ZSPARQLMethod(id, title, endpoint_url)
     parent._setObject(id, ob)
     if REQUEST is not None:

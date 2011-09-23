@@ -15,7 +15,9 @@ Properties of a ZSPARQLMethod
 SPARQL endpoint URL
     The URL of a SPARQL endpoint where queries are sent. See
     SparqlImplementations_ on the w3.org wiki for a list of server
-    implementations.
+    implementations. To avoid entering this value for each new method
+    you can set a ``ZSPARQLMETHOD_DEFAULT_ENDPOINT`` property on a
+    parent object and it will be used to set the endpoint.
 
 Timeout
     Queries may take a long time to complete. In order to avoid blocking a
