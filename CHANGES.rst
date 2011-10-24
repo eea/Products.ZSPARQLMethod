@@ -1,7 +1,10 @@
 Changelog
 =========
 
-0.4 (unreleased)
+0.5 (unreleased)
+----------------
+
+0.4 (2011-10-24)
 ----------------
 
 * Look for `ZSPARQLMETHOD_DEFAULT_ENDPOINT` when creating a method [moregale]
