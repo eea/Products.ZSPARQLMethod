@@ -3,6 +3,9 @@ Changelog
 
 0.5 - (unreleased)
 ------------------
+* Bug fix: in r28259 Fixed the setup.py which referenced to deleted CHANGES.rst
+  which broke the package installation.
+  [demarant] 
 
 0.4.1 - (2012-01-05)
 --------------------
