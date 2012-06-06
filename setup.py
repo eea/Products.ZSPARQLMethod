@@ -7,7 +7,7 @@ install_requires = ['sparql-client']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
-docs = open('README.rst').read() + "\n\n" + open('CHANGES.rst').read()
+docs = open('README.rst').read()
 
 setup(
     name='Products.ZSPARQLMethod',
