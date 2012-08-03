@@ -1,8 +1,11 @@
 from setuptools import setup, find_packages
+from os.path import join
 import sys
 import os
 
-from Products.ZSPARQLMethod import __version__ as version
+NAME = 'Products.ZSPARQLMethod'
+PATH = NAME.split('.') + ['version.txt']
+VERSION = open(join(*PATH)).read().strip()
 
 install_requires = ['sparql-client']
 if sys.version_info < (2, 6):
@@ -12,10 +15,12 @@ docs = open('README.rst').read() + "\n" + \
        open(os.path.join("docs", "HISTORY.txt")).read()
 
 setup(
-    name='Products.ZSPARQLMethod',
-    version=version,
-    author='Eau de Web',
-    author_email='office@eaudeweb.ro',
+    name=NAME,
+    version=VERSION,
+    keywords='sparql rdf linkeddata semanticweb zope python',
+    author='European Environment Agency',
+    author_email="webadmin@eea.europa.eu",
+    url='https://svn.eionet.europa.eu/repositories/Zope/trunk/Products.ZSPARQLMethod',
     license="Mozilla Public License 1.1",
     classifiers = [
         'Environment :: Web Environment',

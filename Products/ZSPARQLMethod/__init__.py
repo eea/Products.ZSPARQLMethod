@@ -1,5 +1,3 @@
-__version__ = '0.5'
-
 try:
     import Globals
     from App.ImageFile import ImageFile

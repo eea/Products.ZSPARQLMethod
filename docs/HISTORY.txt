@@ -3,6 +3,9 @@ Changelog
 
 0.5-dev - (unreleased)
 ----------------------
+* Made more changes to package metadata to comply to EEA release procedures.
+  Added required url and cleaned up old version info logic.
+  [demarant]
 * Added missing version.txt file required by Zope used by eea.eggmonkey.
   Made history.txt conforming to eea.eggmonkey required syntax.
   [demarant]
