@@ -1,6 +1,9 @@
 Changelog
 =========
 
+0.6-dev - (unreleased)
+----------------------
+
 0.5 - (2012-08-03)
 ------------------
 * Made more changes to package metadata to comply to EEA release procedures.
