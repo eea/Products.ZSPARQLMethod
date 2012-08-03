@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 import sys
+import os
 
 from Products.ZSPARQLMethod import __version__ as version
 
