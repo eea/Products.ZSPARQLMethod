@@ -2,3 +2,4 @@ include *.rst
 recursive-include docs *
 recursive-include Products *
 global-exclude *py[co]
+global-include *mo
