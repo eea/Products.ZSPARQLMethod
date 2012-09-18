@@ -3,6 +3,7 @@ import threading
 from time import time
 from _depend import json
 from datetime import datetime
+import urllib2
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Globals import InitializeClass
@@ -244,6 +245,8 @@ def run_with_timeout(timeout, func, *args, **kwargs):
     def thread_job():
         try:
             ret = func(*args, **kwargs)
+        except urllib2.HTTPError, fp:
+            result['exception'] = fp.read()
         except Exception, e:
             result['exception'] = sys.exc_info()
         else:

@@ -3,6 +3,11 @@ Changelog
 
 0.6-dev - (unreleased)
 ----------------------
+* Bug fix: on returned HTTPError from endpoint, display the proper error
+  instead of SaxParserError. 
+  Note: this doesn't work right now with the EEA Content Registry, it needs
+  to work with a third party endpoint.
+  [tiberich refs #5515]
 
 0.5 - (2012-08-03)
 ------------------
