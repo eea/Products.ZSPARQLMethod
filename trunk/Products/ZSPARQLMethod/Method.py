@@ -97,8 +97,10 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         if result is None:
             args = (self.endpoint_url, cooked_query)
             result = run_with_timeout(self.timeout, query_and_get_result, *args)
-            self.ZCacheable_set(result, keywords=cache_key)
+            if not result.get('exception'):
+                self.ZCacheable_set(result['result'], keywords=cache_key)
 
+        #result is a mapping with possible keys 'exception' and 'result'
         return result
 
     _test_html = PageTemplateFile('zpt/method_test.zpt', globals())
@@ -120,7 +122,7 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
 
         if REQUEST is not None:
             REQUEST.RESPONSE.setHeader('Content-Type', 'application/json')
-        return json.dumps(result, default=rdf_values_to_json)
+        return json.dumps(result['result'], default=rdf_values_to_json)
 
     security.declareProtected(view, 'map_arguments')
     def map_arguments(self, **kwargs):
@@ -150,13 +152,9 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         else:
             t0 = time()
 
-            try:
-                data = self.execute(**arg_values)
-
-            except Exception, e:
-                import traceback
-                error = traceback.format_exc()
-                data = None
+            result = self.execute(**arg_values)
+            data = result.get('result')
+            error = result.get('exception')
 
             dt = time() - t0
 
@@ -232,6 +230,7 @@ class MethodResult(object):
         return len(self.rdfterm_rows)
 
 
+import traceback
 
 def run_with_timeout(timeout, func, *args, **kwargs):
     """
@@ -248,7 +247,7 @@ def run_with_timeout(timeout, func, *args, **kwargs):
         except urllib2.HTTPError, fp:
             result['exception'] = fp.read()
         except Exception, e:
-            result['exception'] = sys.exc_info()
+            result['exception'] = traceback.format_exc()
         else:
             result['return'] = ret
 
@@ -258,11 +257,7 @@ def run_with_timeout(timeout, func, *args, **kwargs):
     if worker.isAlive():
         raise QueryTimeout
 
-    if 'exception' in result:
-        exc_info = result['exception']
-        raise exc_info[0], exc_info[1], exc_info[2]
-    else:
-        return result['return']
+    return result
 
 RDF_TERM_FACTORY = {
     'n3term':   sparql.parse_n3_term,
