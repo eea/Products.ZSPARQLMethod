@@ -3,6 +3,8 @@ Changelog
 
 0.6-dev - (unreleased)
 ----------------------
+* Bug fix: Fixed tests for Products.ZSPARQLMethod
+  [szabozo0 refs #5539]
 * Bug fix: on returned HTTPError from endpoint, display the proper error
   instead of SaxParserError. 
   Note: this doesn't work right now with the EEA Content Registry, it needs

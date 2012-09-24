@@ -5,7 +5,7 @@ import mock_db
 import sparql
 
 EIONET_RDF = 'http://rdfdata.eionet.europa.eu/eea'
-SPARQL_URL = "http://cr3.eionet.europa.eu/sparql"
+SPARQL_URL = "http://cr.eionet.europa.eu/sparql"
 
 def _mock_request():
     mock_request = Mock()
@@ -37,7 +37,7 @@ class QueryTest(unittest.TestCase):
         from sparql import IRI
         self.method.query = mock_db.GET_LANGS
         result = self.method.execute()
-        self.assertEqual(result['rows'], [
+        self.assertEqual(result['result']['rows'], [
             (IRI(EIONET_RDF + '/languages/en'),),
             (IRI(EIONET_RDF + '/languages/de'),),
         ])
@@ -56,14 +56,16 @@ class QueryTest(unittest.TestCase):
         class MyError(Exception): pass
         mock_sparql.query.side_effect = MyError
 
-        self.assertRaises(MyError, self.method.execute)
+        result = self.method.execute()
+        if MyError.__name__ not in result['exception']:
+            raise self.failureException, "%s not raised" % MyError.__name__
 
     def test_query_with_arguments(self):
         self.method.query = mock_db.GET_LANG_BY_NAME
         result = self.method.execute(lang_name=sparql.Literal("Danish"))
 
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
-        self.assertEqual(result['rows'], [(danish_iri,)])
+        self.assertEqual(result['result']['rows'], [(danish_iri,)])
 
     def test_call(self):
         self.method.query = mock_db.GET_LANG_BY_NAME

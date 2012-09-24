@@ -10,7 +10,7 @@ class BrowserTest(unittest.TestCase):
         from Products.ZSPARQLMethod.Method import ZSPARQLMethod
 
         self.method = ZSPARQLMethod('sq', "Test Method", "")
-        self.method.endpoint_url = "http://cr3.eionet.europa.eu/sparql"
+        self.method.endpoint_url = "http://cr.eionet.europa.eu/sparql"
         self.method.query = mock_db.GET_LANG_BY_NAME
         self.method.arg_spec = u"lang_name:string"
 

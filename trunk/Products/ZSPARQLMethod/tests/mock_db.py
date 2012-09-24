@@ -59,7 +59,8 @@ class MockSparql(object):
             from urlparse import parse_qs
         except ImportError:
             from cgi import parse_qs
-        query = parse_qs(request.get_data()).get('query', [''])[0]
+        request_query = request.get_full_url().split('?')[1]
+        query = parse_qs(request_query).get('query', [''])[0]
 
         response = Mock()
         response.fp = StringIO(self.queries[query])

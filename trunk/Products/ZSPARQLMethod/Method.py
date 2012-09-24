@@ -98,7 +98,7 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
             args = (self.endpoint_url, cooked_query)
             result = run_with_timeout(self.timeout, query_and_get_result, *args)
             if not result.get('exception'):
-                self.ZCacheable_set(result['result'], keywords=cache_key)
+                self.ZCacheable_set(result, keywords=cache_key)
 
         #result is a mapping with possible keys 'exception' and 'result'
         return result
@@ -214,9 +214,9 @@ class MethodResult(object):
         'var_names': 1, 'has_result': 1, '__iter__': 1, '__getitem__': 1}
 
     def __init__(self, result_dict):
-        self.var_names = result_dict['var_names']
-        self.rdfterm_rows = result_dict['rows']
-        self.has_result = result_dict['has_result']
+        self.var_names = result_dict['result']['var_names']
+        self.rdfterm_rows = result_dict['result']['rows']
+        self.has_result = result_dict['result']['has_result']
 
     def __iter__(self):
         return (sparql.unpack_row(r, convert_type=sparql_converters)
@@ -249,7 +249,7 @@ def run_with_timeout(timeout, func, *args, **kwargs):
         except Exception, e:
             result['exception'] = traceback.format_exc()
         else:
-            result['return'] = ret
+            result['result'] = ret
 
     worker = threading.Thread(target=thread_job)
     worker.start()
