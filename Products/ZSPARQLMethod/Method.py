@@ -1,9 +1,7 @@
 import sys
-import threading
 from time import time
 from _depend import json
 from datetime import datetime
-import urllib2
 
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Globals import InitializeClass
@@ -178,12 +176,12 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
 InitializeClass(ZSPARQLMethod)
 
 
-def query_and_get_result(*args):
+def query_and_get_result(*args, **kwargs):
     """
     Helper function that calls `sparql.query` with the given arguments and
     returns its results as an easy-to-cache dictionary.
     """
-    result = sparql.query(*args)
+    result = sparql.query(*args, timeout = kwargs.get("timeout", 0))
     return {
         'var_names': [unicode(name) for name in result.variables],
         'rows': result.fetchall(),
@@ -240,22 +238,18 @@ def run_with_timeout(timeout, func, *args, **kwargs):
     received.
     """
 
+    kwargs['timeout'] = timeout
     result = {}
-    def thread_job():
-        try:
-            ret = func(*args, **kwargs)
-        except urllib2.HTTPError, fp:
-            result['exception'] = fp.read()
-        except Exception, e:
-            result['exception'] = traceback.format_exc()
-        else:
-            result['result'] = ret
-
-    worker = threading.Thread(target=thread_job)
-    worker.start()
-    worker.join(timeout)
-    if worker.isAlive():
-        raise QueryTimeout
+    try:
+        ret = func(*args, **kwargs)
+    except sparql.SparqlException, e:
+        if e.code == 28:
+            raise QueryTimeout
+        result['exception'] = e.message
+    except Exception, e:
+        result['exception'] = traceback.format_exc()
+    else:
+        result['result'] = ret
 
     return result
 
