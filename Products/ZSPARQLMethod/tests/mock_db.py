@@ -1,4 +1,4 @@
-import urllib2
+import pycurl
 from os import path
 from StringIO import StringIO
 from mock import Mock, patch
@@ -38,30 +38,43 @@ def read_response_xml(name):
     f.close()
     return data
 
-class MockSparql(object):
-    queries = {
+QUERIES = {
         pack(GET_LANGS): read_response_xml('get_languages'),
         pack(GET_LANG_NAMES): read_response_xml('get_lang_names'),
         pack(GET_LANG_BY_NAME_DA): read_response_xml('get_lang_by_name-da'),
     }
 
-    def start(self):
-        self.urllib2_patch = patch('sparql.urllib2')
-        mock_urllib2 = self.urllib2_patch.start()
-        mock_urllib2.Request = urllib2.Request
-        mock_urllib2.urlopen = self.mock_urlopen
+class MockCurl(object):
+    def setopt(self, opt, value):
+        if opt == pycurl.WRITEFUNCTION:
+            self.writefunction = value
+        if opt == pycurl.URL:
+            self.url = value
 
-    def stop(self):
-        self.urllib2_patch.stop()
-
-    def mock_urlopen(self, request):
+    def perform(self):
         try:
             from urlparse import parse_qs
         except ImportError:
             from cgi import parse_qs
-        request_query = request.get_full_url().split('?')[1]
-        query = parse_qs(request_query).get('query', [''])[0]
+        querystring = self.url.split('?', 1)[1]
+        query = parse_qs(querystring).get('query', [''])[0]
 
-        response = Mock()
-        response.fp = StringIO(self.queries[query])
-        return response
+        self.writefunction(QUERIES[query])
+        return
+
+    def getinfo(self, info):
+        return 200
+
+class MockSparql(object):
+    def start(self):
+        self.pycurl_patch = patch('sparql.pycurl')
+        mock_pycurl = self.pycurl_patch.start()
+        mock_pycurl.Curl = self.mock_Curl
+        mock_pycurl.WRITEFUNCTION = pycurl.WRITEFUNCTION
+        mock_pycurl.URL = pycurl.URL
+
+    def stop(self):
+        self.pycurl_patch.stop()
+
+    def mock_Curl(self):
+        return MockCurl()
