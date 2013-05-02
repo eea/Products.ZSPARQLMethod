@@ -1,4 +1,4 @@
-import pycurl
+import pycurl2 as pycurl
 from os import path
 from StringIO import StringIO
 from mock import Mock, patch
