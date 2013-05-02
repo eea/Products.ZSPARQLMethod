@@ -42,11 +42,24 @@ class QueryTest(unittest.TestCase):
             (IRI(EIONET_RDF + '/languages/de'),),
         ])
 
-    @patch('Products.ZSPARQLMethod.Method.threading')
-    def test_timeout(self, mock_threading):
+    @patch('Products.ZSPARQLMethod.Method.sparql.pycurl')
+    def test_timeout(self, mock_pycurl):
+        class MockCurl(object):
+            def perform(self):
+                import sparql
+                raise sparql.SparqlException(28, "timeout")
+
+            def setopt(self, value, opt):
+                pass
+
+        def mock_Curl():
+            return MockCurl()
+
+
+        mock_pycurl.Curl = mock_Curl
+
         from Products.ZSPARQLMethod.Method import QueryTimeout
         self.method.query = mock_db.GET_LANGS
-        mock_threading.Thread.return_value.isAlive.return_value = True
 
         self.assertRaises(QueryTimeout, self.method.execute)
 
