@@ -1,8 +1,8 @@
 Changelog
 =========
 
-0.7-dev - (unreleased)
-----------------------
+0.7 - (2013-05-20)
+------------------
 * Change: Updated to work with changed sparql-client
   [szabozo0 refs #14349]
 * Bug fix: Updated run_with_timeout to not use threading as timeout but pass the timeout value to the sparql-client
