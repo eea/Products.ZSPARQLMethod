@@ -1,6 +1,9 @@
 Changelog
 =========
 
+0.8-dev - (unreleased)
+----------------------
+
 0.7 - (2013-05-20)
 ------------------
 * Change: Updated to work with changed sparql-client
