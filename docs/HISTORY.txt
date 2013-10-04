@@ -16,7 +16,7 @@ Changelog
 * Bug fix: Fixed tests for Products.ZSPARQLMethod
   [szabozo0 refs #5539]
 * Bug fix: on returned HTTPError from endpoint, display the proper error
-  instead of SaxParserError. 
+  instead of SaxParserError.
   Note: this doesn't work right now with the EEA Content Registry, it needs
   to work with a third party endpoint.
   [tiberich refs #5515]
@@ -31,7 +31,7 @@ Changelog
   [demarant]
 * Bug fix: in r28259 Fixed the setup.py which referenced to deleted CHANGES.rst
   which broke the package installation.
-  [demarant] 
+  [demarant]
 
 0.4.1 - (2012-01-05)
 --------------------
