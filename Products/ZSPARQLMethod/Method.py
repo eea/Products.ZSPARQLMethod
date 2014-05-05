@@ -2,15 +2,13 @@ import sys
 from time import time
 from _depend import json
 from datetime import datetime
-
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Globals import InitializeClass
+from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view, view_management_screens
 from OFS.SimpleItem import SimpleItem
 from OFS.Cache import Cacheable
 import DateTime
-
 import sparql
 
 class QueryTimeout(Exception):

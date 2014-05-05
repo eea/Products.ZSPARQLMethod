@@ -3,6 +3,8 @@ Changelog
 
 0.8-dev - (unreleased)
 ----------------------
+* Change: updated imported modules to get rid of DeprecationWarning
+  [ghicaale refs #19289]
 
 0.7 - (2013-05-20)
 ------------------
