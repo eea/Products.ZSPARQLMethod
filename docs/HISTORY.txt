@@ -1,6 +1,9 @@
 Changelog
 =========
 
+0.9-dev - (unreleased)
+----------------------
+
 0.8 - (2014-05-13)
 ------------------
 * Change: updated imported modules to get rid of DeprecationWarning
