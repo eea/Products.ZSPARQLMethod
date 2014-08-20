@@ -7,6 +7,7 @@ from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view, view_management_screens
 from OFS.SimpleItem import SimpleItem
+from OFS.History import html_diff, Historical
 from OFS.Cache import Cacheable
 import DateTime
 import sparql
@@ -33,16 +34,18 @@ def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     if REQUEST is not None:
         REQUEST.RESPONSE.redirect(parent.absolute_url() + '/manage_workspace')
 
-class ZSPARQLMethod(SimpleItem, Cacheable):
+class ZSPARQLMethod(SimpleItem, Historical, Cacheable):
     """
     Persistent SPARQL parametrized query.
     """
 
     meta_type = "Z SPARQL Method"
     manage_options = (
-        {'label': 'Edit', 'action': 'manage_edit_html'},
-        {'label': 'Test', 'action': 'test_html'},
-    ) + SimpleItem.manage_options + Cacheable.manage_options
+        ({'label': 'Edit', 'action': 'manage_edit_html'},
+        {'label': 'Test', 'action': 'test_html'})
+        + Historical.manage_options
+        + SimpleItem.manage_options
+        + Cacheable.manage_options)
 
     security = ClassSecurityInfo()
 
@@ -79,6 +82,12 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         self.ZCacheable_invalidate()
         REQUEST.SESSION['messages'] = ["Saved changes. (%s)" % (datetime.now())]
         REQUEST.RESPONSE.redirect(self.absolute_url() + '/manage_workspace')
+
+    def manage_historyCompare(self, rev1, rev2, REQUEST,
+                              historyComparisonResults=''):
+        return ZSPARQLMethod.inheritedAttribute('manage_historyCompare')(
+            self, rev1, rev2, REQUEST,
+            historyComparisonResults = html_diff(rev1.query, rev2.query))
 
     security.declareProtected(view, 'execute')
     def execute(self, **arg_values):

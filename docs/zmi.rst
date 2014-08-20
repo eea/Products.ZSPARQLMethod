@@ -73,6 +73,11 @@ address. Also, enter the query template and arguments specification:
 
 .. image:: zmi-screenshots/4.png
 
+.. warning::
+
+Comments inside SPARQL queries are not supported.
+Unicode characters in names are not supported.
+
 Now let's run a test query from the `test` tab. Initially no argumenet is set,
 so we are shown variable's placeholder:
 
