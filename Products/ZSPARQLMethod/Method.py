@@ -75,7 +75,7 @@ class ZSPARQLMethod(SimpleItem, Historical, Cacheable):
         self.endpoint_url= REQUEST.form['endpoint_url']
         timeout = REQUEST.form['timeout'] or None
         if timeout is not None:
-            timeout = float(timeout)
+            timeout = int(timeout)
         self.timeout = timeout
         self.query = REQUEST.form['query']
         self.arg_spec = REQUEST.form['arg_spec']
