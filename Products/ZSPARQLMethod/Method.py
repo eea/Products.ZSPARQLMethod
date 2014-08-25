@@ -83,6 +83,15 @@ class ZSPARQLMethod(SimpleItem, Historical, Cacheable):
         REQUEST.SESSION['messages'] = ["Saved changes. (%s)" % (datetime.now())]
         REQUEST.RESPONSE.redirect(self.absolute_url() + '/manage_workspace')
 
+    security.declareProtected(view_management_screens, 'document_src')
+    def document_src(self, REQUEST=None, **kwargs):
+        """ Return processed document source. """
+        if REQUEST is not None:
+            kwargs.update(REQUEST.form)
+        arg_values = self.map_arguments(**kwargs)
+
+        return interpolate_query_html(self.query, arg_values)
+
     def manage_historyCompare(self, rev1, rev2, REQUEST,
                               historyComparisonResults=''):
         return ZSPARQLMethod.inheritedAttribute('manage_historyCompare')(
