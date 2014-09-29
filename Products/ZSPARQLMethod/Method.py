@@ -83,7 +83,7 @@ class ZSPARQLMethod(SimpleItem, Historical, Cacheable):
         REQUEST.SESSION['messages'] = ["Saved changes. (%s)" % (datetime.now())]
         REQUEST.RESPONSE.redirect(self.absolute_url() + '/manage_workspace')
 
-    security.declareProtected(view_management_screens, 'document_src')
+    security.declareProtected(view, 'document_src')
     def document_src(self, REQUEST=None, **kwargs):
         """ Return processed document source. """
         if REQUEST is not None:
