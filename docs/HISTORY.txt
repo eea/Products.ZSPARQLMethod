@@ -3,6 +3,7 @@ Changelog
 
 1.0-dev - (unreleased)
 ----------------------
+* document_src protected with view permission [nituacor]
 
 0.9 - (2014-08-22)
 ----------------------
