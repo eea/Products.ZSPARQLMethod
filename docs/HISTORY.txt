@@ -1,14 +1,15 @@
 Changelog
 =========
 
-1.1-dev - (unreleased)
-----------------------
+1.1.dev0 - (unreleased)
+-----------------------
 * Change: updated package information
   [eduard-fironda]
 
 1.0 - (2014-10-01)
 ------------------
-* document_src protected with view permission [nituacor]
+* document_src protected with view permission
+  [nituacor]
 
 0.9 - (2014-08-22)
 ----------------------
