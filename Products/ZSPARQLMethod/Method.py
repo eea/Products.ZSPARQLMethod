@@ -205,6 +205,16 @@ def query_and_get_result(*args, **kwargs):
     }
 
 
+def raw_query_and_get_result(*args, **kwargs):
+    """
+    Returns unparsed query results for xml, xmlschema, json formats
+    """
+    timeout = kwargs.get("timeout", 0)
+    accept = kwargs.get("accept", "application/sparql-results+xml")
+    result = sparql.query(*args, timeout=timeout, accept=accept, raw=True)
+    return result
+
+
 class MethodResult(object):
     """
     MethodResult Encapsulates a query result. It provides convenient

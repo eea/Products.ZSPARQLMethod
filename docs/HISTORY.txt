@@ -3,6 +3,9 @@ Changelog
 
 1.2.dev0 - (unreleased)
 -----------------------
+* Change: Added sparql export method formats (xml, xmlschema, json) to be stored
+  and retrieved from cache
+  [zoltan_andras refs #86464]
 
 1.1 - (2017-04-24)
 ------------------
