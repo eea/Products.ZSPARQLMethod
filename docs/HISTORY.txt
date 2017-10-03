@@ -3,6 +3,9 @@ Changelog
 
 1.3.dev0 - (unreleased)
 -----------------------
+* Bug fix: Remove tests dependency on pycurl and fix dependency on
+  wsgi_intercept
+  [petchesi-iulian refs #88509]
 
 1.2 - (2017-07-18)
 ------------------

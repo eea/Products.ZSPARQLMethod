@@ -1,7 +1,9 @@
-import pycurl2 as pycurl
+import eventlet
+from eventlet.green import urllib2
 from os import path
 from StringIO import StringIO
 from mock import Mock, patch
+import tempfile
 
 GET_LANGS = """\
 SELECT ?lang_url WHERE {
@@ -46,10 +48,12 @@ QUERIES = {
 
 class MockCurl(object):
     def setopt(self, opt, value):
-        if opt == pycurl.WRITEFUNCTION:
-            self.writefunction = value
-        if opt == pycurl.URL:
-            self.url = value
+        pass
+        # import pdb; pdb.set_trace()
+        # if opt == pycurl.WRITEFUNCTION:
+            # self.writefunction = value
+        # if opt == pycurl.URL:
+            # self.url = value
 
     def perform(self):
         try:
@@ -67,11 +71,12 @@ class MockCurl(object):
 
 class MockSparql(object):
     def start(self):
-        self.pycurl_patch = patch('sparql.pycurl')
+        self.pycurl_patch = patch('sparql.query')
         mock_pycurl = self.pycurl_patch.start()
         mock_pycurl.Curl = self.mock_Curl
-        mock_pycurl.WRITEFUNCTION = pycurl.WRITEFUNCTION
-        mock_pycurl.URL = pycurl.URL
+        buf = tempfile.NamedTemporaryFile()
+        mock_pycurl.WRITEFUNCTION = buf.write
+        mock_pycurl.URL = urllib2.urlopen
 
     def stop(self):
         self.pycurl_patch.stop()

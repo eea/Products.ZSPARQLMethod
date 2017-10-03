@@ -42,7 +42,7 @@ class QueryTest(unittest.TestCase):
             (IRI(EIONET_RDF + '/languages/de'),),
         ])
 
-    @patch('Products.ZSPARQLMethod.Method.sparql.pycurl')
+    @patch('Products.ZSPARQLMethod.Method.sparql.query')
     def test_timeout(self, mock_pycurl):
         class MockCurl(object):
             def perform(self):
@@ -61,6 +61,7 @@ class QueryTest(unittest.TestCase):
         from Products.ZSPARQLMethod.Method import QueryTimeout
         self.method.query = mock_db.GET_LANGS
 
+        # self.method.timeout = 2
         self.assertRaises(QueryTimeout, self.method.execute)
 
     @patch('Products.ZSPARQLMethod.Method.sparql')

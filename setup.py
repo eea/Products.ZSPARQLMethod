@@ -41,5 +41,15 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=install_requires,
+    # install_requires=install_requires,
+    install_requires=[
+        'wsgi_intercept==0.4',
+        'webob',
+        'eventlet',
+    ],
+    extras_require={
+        'test': [
+            'mock',
+        ]
+    },
 )
