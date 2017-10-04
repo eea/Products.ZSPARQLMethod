@@ -22,9 +22,11 @@ SELECT * WHERE {
 
 GET_LANG_BY_NAME = """\
 PREFIX eea_ontology: <http://rdfdata.eionet.europa.eu/eea/ontology/>
-SELECT * WHERE {
+PREFIX rdf_schema: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?lang_url WHERE {
   ?lang_url a eea_ontology:Language .
-  ?lang_url eea_ontology:name ${lang_name} .
+  ?lang_url rdf_schema:label ?lang_label .
+FILTER (?lang_label = ${lang_name})
 }
 """
 
@@ -48,12 +50,11 @@ QUERIES = {
 
 class MockCurl(object):
     def setopt(self, opt, value):
-        pass
-        # import pdb; pdb.set_trace()
-        # if opt == pycurl.WRITEFUNCTION:
-            # self.writefunction = value
-        # if opt == pycurl.URL:
-            # self.url = value
+        buf = tempfile.NamedTemporaryFile()
+        if opt == buf.write:
+            self.writefunction = value
+        if opt == urllib2.urlopen:
+            self.url = value
 
     def perform(self):
         try:

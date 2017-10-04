@@ -51,7 +51,10 @@ class BrowserTest(unittest.TestCase):
         self.method.query = mock_db.GET_LANG_NAMES
         self.method.arg_spec = u""
         br = self.browser
+
+        self.mock_db.stop()
         page = parse_html(br.open('http://test/test_html').read())
+        self.mock_db.start()
         table = css(page, 'table.sparql-results')[0]
 
         table_headings = [e.text for e in css(table, 'thead th')]
@@ -68,8 +71,11 @@ class BrowserTest(unittest.TestCase):
         br.open('http://test/test_html')
         br.select_form(name='method-arguments')
         br['lang_name:utf8:ustring'] = "Danish"
+
+        self.mock_db.stop()
         page = parse_html(br.submit().read())
 
+        self.mock_db.start()
         self.assertEqual(csstext(page, 'table.sparql-results tbody td'),
                          u"<http://rdfdata.eionet.europa.eu/eea/languages/da>")
 
@@ -90,7 +96,9 @@ class BrowserTest(unittest.TestCase):
         from test_method import EIONET_RDF
 
         req = Request.blank('http://test/?lang_name=Danish')
+        self.mock_db.stop()
         response = req.get_response(self.app)
+        self.mock_db.start()
 
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_response = json.loads(response.body)
