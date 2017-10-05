@@ -43,14 +43,17 @@ setup(
     zip_safe=False,
     # install_requires=install_requires,
     install_requires=[
-        'mechanize==0.2.5',
+        'mechanize',
         'wsgi_intercept==0.4',
         'webob',
         'eventlet',
+        # 'mechanize==0.2.5'
     ],
     extras_require={
         'test': [
             'mock',
+            'BeautifulSoup',
+            'sparql-client',
         ]
     },
 )
