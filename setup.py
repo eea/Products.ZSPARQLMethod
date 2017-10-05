@@ -11,7 +11,9 @@ install_requires = ['sparql-client']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
-install_requires += ['mechanize', 'wsgi_intercept', 'webob', 'eventlet']
+install_requires += ['mechanize==0.2.5', 'wsgi_intercept==0.4', 'webob',
+                     'eventlet', 'BeautifulSoup',
+                    ]
 
 docs = open('README.rst').read() + "\n" + \
        open(os.path.join("docs", "HISTORY.txt")).read()
@@ -47,7 +49,6 @@ setup(
     extras_require={
         'test': [
             'mock',
-            'BeautifulSoup',
         ]
     },
 )
