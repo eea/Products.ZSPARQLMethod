@@ -11,7 +11,7 @@ install_requires = ['sparql-client']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
-install_requires += ['mechanize', 'wsgi_intercept==0.4', 'webob', 'eventlet']
+install_requires += ['mechanize', 'wsgi_intercept', 'webob', 'eventlet']
 
 docs = open('README.rst').read() + "\n" + \
        open(os.path.join("docs", "HISTORY.txt")).read()
