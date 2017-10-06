@@ -8,7 +8,7 @@ from webob import Response
 from webob.exc import HTTPNotFound, HTTPForbidden
 from webob.dec import wsgify
 
-import lxml.cssselect, lxml.html.soupparser
+import lxml.cssselect, lxml.html
 
 from mock import Mock
 
@@ -75,4 +75,4 @@ def csstext(target, selector):
     return ' '.join(e.text_content() for e in css(target, selector)).strip()
 
 def parse_html(html):
-    return lxml.html.soupparser.fromstring(html)
+    return lxml.html.fromstring(html)
