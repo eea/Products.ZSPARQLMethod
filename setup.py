@@ -12,7 +12,7 @@ if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
 install_requires += ['mechanize==0.2.5', 'wsgi_intercept==0.4', 'webob',
-                     'eventlet', 'BeautifulSoup',
+                     'eventlet', 'beautifulsoup4',
                     ]
 
 docs = open('README.rst').read() + "\n" + \
