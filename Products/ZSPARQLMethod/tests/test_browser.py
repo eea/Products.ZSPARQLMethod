@@ -5,6 +5,11 @@ import wsgi_intercept.mechanize_intercept
 from zope_wsgi import WsgiApp, css, csstext, parse_html
 import mock_db
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 
 class BrowserTest(unittest.TestCase):
     def setUp(self):
@@ -93,7 +98,6 @@ class BrowserTest(unittest.TestCase):
     def test_REST_query(self):
         from webob import Request
         import sparql
-        from Products.ZSPARQLMethod._depend import json
         from test_method import EIONET_RDF
 
         req = Request.blank('http://test/?lang_name=Danish')

@@ -1,5 +1,4 @@
 try:
-    import Globals
     from App.ImageFile import ImageFile
     misc_ = {'method.gif': ImageFile('www/method.gif', globals())}
 except ImportError:

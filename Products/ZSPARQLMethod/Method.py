@@ -1,5 +1,4 @@
 from time import time
-from _depend import json
 from datetime import datetime
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from App.class_init import InitializeClass
@@ -10,6 +9,12 @@ from OFS.History import html_diff, Historical
 from OFS.Cache import Cacheable
 import DateTime
 import sparql
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 
 class QueryTimeout(Exception):
     pass
