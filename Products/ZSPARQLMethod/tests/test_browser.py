@@ -1,5 +1,5 @@
 import unittest
-from mock import Mock, patch
+from mock import patch
 import wsgi_intercept
 import wsgi_intercept.mechanize_intercept
 from zope_wsgi import WsgiApp, css, csstext, parse_html

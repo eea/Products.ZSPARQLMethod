@@ -32,7 +32,6 @@ class WsgiApp(object):
         from OFS.Application import Application
         app = Application()
 
-        from ZPublisher.HTTPRequest import HTTPRequest
         from zExceptions import Forbidden
         app.REQUEST = zope_request = get_zope_request(request)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os
+# import sys, os
 
 extensions = ['sphinx.ext.autodoc']
 

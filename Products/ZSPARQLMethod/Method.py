@@ -1,4 +1,3 @@
-import sys
 from time import time
 from _depend import json
 from datetime import datetime

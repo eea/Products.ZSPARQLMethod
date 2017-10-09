@@ -1,8 +1,6 @@
-import eventlet
 from eventlet.green import urllib2
 from os import path
-from StringIO import StringIO
-from mock import Mock, patch
+from mock import patch
 import tempfile
 
 GET_LANGS = """\
