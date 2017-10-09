@@ -55,7 +55,7 @@
                tal:attributes="name input_name; value prev_value"/>
       </td>
     </tr>
-    <tr><td colspan="2"><input type="submit" value="Execute"/></td></tr>
+    <tr><td colspan="2"><input type="submit" value="Execute" i18n:attributes="value"/></td></tr>
   </table>
 </form>
 
@@ -63,10 +63,10 @@
             tal:condition="options/query|nothing"
             tal:content="structure options/query"/>
 
-<p class="sparql-stats" tal:condition="options/data">
+<p class="sparql-stats" tal:condition="options/data" i18n:translate="">
   Received
   <span class="number" tal:content="python:len(options['data']['rows'])"/>
-  rows<tal:block condition="python:'duration' in options"> in
+  rows<tal:block condition="python:'duration' in options" i18n:translate=""> in
     <span class="number" tal:content="python:'%.3f' % options['duration']"/>
   seconds</tal:block>.
 </p>
@@ -88,9 +88,10 @@
 
 <p class="sparql-has-result"
    tal:define="has_result options/data/has_result|nothing"
-   tal:condition="python: has_result is not None">
+   tal:condition="python: has_result is not None"
+   i18n:translate="">
   Query
-  <span class="boolean">will<tal:block condition="not:has_result">
+  <span class="boolean" i18n:translate="">will<tal:block condition="not:has_result" i18n:translate="">
     not</tal:block></span>
   return a result.
 </p>

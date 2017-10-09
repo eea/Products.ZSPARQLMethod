@@ -3,6 +3,8 @@ Changelog
 
 1.3.dev0 - (unreleased)
 -----------------------
+* Bug fix: Fix i18n
+  [petchesi-iulian refs #88509]
 * Bug fix: Fix PyFlakes
   [petchesi-iulian refs #88509]
 * Bug fix: Fix failing tests
