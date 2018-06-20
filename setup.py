@@ -17,7 +17,7 @@ docs = open('README.rst').read() + "\n" + \
 setup(
     name=NAME,
     version=VERSION,
-    # http://pypi.python.org/pypi?%3Aaction=list_classifiers
+    # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         "Framework :: Zope2",
         "Framework :: Plone",
