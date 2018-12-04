@@ -12,4 +12,4 @@ section of your ``buildout.cfg``.
 Afterwards follow the :ref:`tutorial` on how to create a ``Z sPARQL Method``
 object in ZMI.
 
-.. _`from PyPI`: http://pypi.python.org/pypi/Products.ZSPARQLMethod
+.. _`from PyPI`: https://pypi.python.org/pypi/Products.ZSPARQLMethod

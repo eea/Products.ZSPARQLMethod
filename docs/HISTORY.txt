@@ -1,8 +1,15 @@
 Changelog
 =========
 
-1.4.dev0 - (unreleased)
+1.5 - (2018-12-04)
 -----------------------
+* Bug fix: Changed endpoint in tests to https://cr.eionet.europa.eu/sparql
+  [szabozo0]
+* Change: updated URLs pointing to eea.europa.eu with https://
+  [alecghica refs #95849]
+
+1.4 - (2017-12-12)
+------------------
 * Change: Replace eeacms/zptlint with eeacms/plone-test:4 zptlint
   [avoinea refs #90415]
 
@@ -39,7 +46,7 @@ Changelog
 * return processed document source
   [nituacor]
 
-0.9-dev - (2014-08-22)
+0.9 - (2014-08-22)
 ----------------------
 * History tab added
   [nituacor]
