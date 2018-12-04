@@ -47,6 +47,7 @@ setup(
             'mock',
             'mechanize==0.2.5',
             'wsgi_intercept==0.4',
+            'cssselect',
             'webob',
         ]
     },
