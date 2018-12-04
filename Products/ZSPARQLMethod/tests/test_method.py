@@ -8,7 +8,7 @@ from Products.ZSPARQLMethod.Method import QueryTimeout
 
 
 EIONET_RDF = 'http://rdfdata.eionet.europa.eu/eea'
-SPARQL_URL = "http://cr.eionet.europa.eu/sparql"
+SPARQL_URL = "https://cr.eionet.europa.eu/sparql"
 
 def _mock_request():
     mock_request = Mock()
