@@ -3,6 +3,8 @@ Changelog
 
 1.6-dev0 - (unreleased)
 ---------------------
+* Feature: better error message on SPARQL execution
+  [alecghica refs #100666]
 
 1.5 - (2018-12-04)
 -----------------------
