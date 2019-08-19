@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.8 - (2019-08-19)
+---------------------
+* Change: fixed tests
+  [alecghica refs #108306]
+
 1.7 - (2019-01-28)
 ---------------------
 * Jenkins: Add sonarqube step
