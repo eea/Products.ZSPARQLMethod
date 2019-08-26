@@ -3,6 +3,8 @@ Changelog
 
 1.9-dev0 - (unreleased)
 ---------------------------
+* Change: Fixed mock tests
+  [avoinea refs #108256]
 
 1.8 - (2019-08-19)
 ---------------------
