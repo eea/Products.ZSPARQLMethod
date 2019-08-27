@@ -37,6 +37,7 @@ setup(
     url='https://github.com/eea/Products.ZSPARQLMethod',
     license='GPL',
     description="Zope product for making SPARQL queries, simiar to ZSQLMethod",
+    long_description_content_type='text/x-rst',
     long_description=docs,
     packages=find_packages(),
     include_package_data=True,

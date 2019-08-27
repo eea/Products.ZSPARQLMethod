@@ -1,7 +1,5 @@
-from eventlet.green import urllib2
 from os import path
-from mock import patch
-import tempfile
+from Products.ZSPARQLMethod.Method import sparql
 
 GET_LANGS = """\
 SELECT ?lang_url WHERE {
@@ -46,39 +44,28 @@ QUERIES = {
         pack(GET_LANG_BY_NAME_DA): read_response_xml('get_lang_by_name-da'),
     }
 
-class MockCurl(object):
-    def setopt(self, opt, value):
-        buf = tempfile.NamedTemporaryFile()
-        if opt == buf.write:
-            self.writefunction = value
-        if opt == urllib2.urlopen:
-            self.url = value
+class MockResponse(object):
+    def getcode(self):
+        return 200
 
-    def perform(self):
+
+class MockQuery(sparql._Query):
+    def _get_response(self, opener, request, buf, timeout):
+        self.querystring = request.get_data()
+        return MockResponse()
+
+    def _read_response(self, response, buf, timeout):
         try:
             from urlparse import parse_qs
         except ImportError:
             from cgi import parse_qs
-        querystring = self.url.split('?', 1)[1]
-        query = parse_qs(querystring).get('query', [''])[0]
-
-        self.writefunction(QUERIES[query])
-        return
-
-    def getinfo(self, info):
-        return 200
+        query = parse_qs(self.querystring).get('query', [''])[0]
+        buf.write(QUERIES[pack(query)])
 
 class MockSparql(object):
     def start(self):
-        self.pycurl_patch = patch('sparql.query')
-        mock_pycurl = self.pycurl_patch.start()
-        mock_pycurl.Curl = self.mock_Curl
-        buf = tempfile.NamedTemporaryFile()
-        mock_pycurl.WRITEFUNCTION = buf.write
-        mock_pycurl.URL = urllib2.urlopen
+        self.old_Query = sparql._Query
+        sparql._Query = MockQuery
 
     def stop(self):
-        self.pycurl_patch.stop()
-
-    def mock_Curl(self):
-        return MockCurl()
+        sparql._Query = self.old_Query

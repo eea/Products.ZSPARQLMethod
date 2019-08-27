@@ -3,6 +3,10 @@ from mock import patch
 import wsgi_intercept
 import wsgi_intercept.mechanize_intercept
 from zope_wsgi import WsgiApp, css, csstext, parse_html
+from webob import Request
+from Products.ZSPARQLMethod.Method import sparql
+from Products.ZSPARQLMethod.Method import ZSPARQLMethod
+from test_method import EIONET_RDF
 import mock_db
 
 try:
@@ -13,8 +17,6 @@ except ImportError:
 
 class BrowserTest(unittest.TestCase):
     def setUp(self):
-        from Products.ZSPARQLMethod.Method import ZSPARQLMethod
-
         self.method = ZSPARQLMethod('sq', "Test Method", "")
         self.method.endpoint_url = "https://cr.eionet.europa.eu/sparql"
         self.method.query = mock_db.GET_LANG_BY_NAME
@@ -58,9 +60,7 @@ class BrowserTest(unittest.TestCase):
         self.method.arg_spec = u""
         br = self.browser
 
-        self.mock_db.stop()
         page = parse_html(br.open('http://test/test_html').read())
-        self.mock_db.start()
         table = css(page, 'table.sparql-results')[0]
 
         table_headings = [e.text for e in css(table, 'thead th')]
@@ -70,7 +70,7 @@ class BrowserTest(unittest.TestCase):
                       for tr in css(table, 'tbody tr')]
         self.assertEqual(len(table_data), 45)
         lang_da_url = 'http://rdfdata.eionet.europa.eu/eea/languages/da'
-        self.assertEqual(table_data[5], ['<'+lang_da_url+'>', '"Danish"@en'])
+        self.assertEqual(table_data[7], ['<'+lang_da_url+'>', '"Danish"@en'])
 
     def test_with_literal_argument(self):
         br = self.browser
@@ -78,10 +78,7 @@ class BrowserTest(unittest.TestCase):
         br.select_form(name='method-arguments')
         br['lang_name:utf8:ustring'] = "Danish"
 
-        self.mock_db.stop()
         page = parse_html(br.submit().read())
-
-        self.mock_db.start()
         self.assertEqual(csstext(page, 'table.sparql-results tbody td'),
                          u"<http://rdfdata.eionet.europa.eu/eea/languages/da>")
 
@@ -96,14 +93,8 @@ class BrowserTest(unittest.TestCase):
         self.assertEqual(br['lang_name:utf8:ustring'], "Danish")
 
     def test_REST_query(self):
-        from webob import Request
-        import sparql
-        from test_method import EIONET_RDF
-
         req = Request.blank('http://test/?lang_name=Danish')
-        self.mock_db.stop()
         response = req.get_response(self.app)
-        self.mock_db.start()
 
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         json_response = json.loads(response.body)

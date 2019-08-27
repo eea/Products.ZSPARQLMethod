@@ -28,6 +28,7 @@ class SimpleMockResult(object):
 
 class QueryTest(unittest.TestCase):
     def setUp(self):
+        self.maxDiff = None
         from Products.ZSPARQLMethod.Method import ZSPARQLMethod
         self.method = ZSPARQLMethod('sq', "Test Method", SPARQL_URL)
         self.mock_db = mock_db.MockSparql()
@@ -38,75 +39,17 @@ class QueryTest(unittest.TestCase):
 
     def test_simple_query(self):
         from sparql import IRI
-        self.mock_db.stop()
         self.method.query = mock_db.GET_LANGS
         result = self.method.execute()
-
-        self.mock_db.start()
         self.assertEqual(result['result']['rows'], [
-            (IRI(EIONET_RDF + '/languages/az'),),
-            (IRI(EIONET_RDF + '/languages/be'),),
-            (IRI(EIONET_RDF + '/languages/bg'),),
-            (IRI(EIONET_RDF + '/languages/bs'),),
-            (IRI(EIONET_RDF + '/languages/cs'),),
-            (IRI(EIONET_RDF + '/languages/da'),),
-            (IRI(EIONET_RDF + '/languages/de'),),
-            (IRI(EIONET_RDF + '/languages/el'),),
             (IRI(EIONET_RDF + '/languages/en'),),
-            (IRI(EIONET_RDF + '/languages/es'),),
-            (IRI(EIONET_RDF + '/languages/et'),),
-            (IRI(EIONET_RDF + '/languages/fi'),),
-            (IRI(EIONET_RDF + '/languages/fr'),),
-            (IRI(EIONET_RDF + '/languages/ga'),),
-            (IRI(EIONET_RDF + '/languages/hr'),),
-            (IRI(EIONET_RDF + '/languages/hu'),),
-            (IRI(EIONET_RDF + '/languages/hy'),),
-            (IRI(EIONET_RDF + '/languages/is'),),
-            (IRI(EIONET_RDF + '/languages/it'),),
-            (IRI(EIONET_RDF + '/languages/ka'),),
-            (IRI(EIONET_RDF + '/languages/kk'),),
-            (IRI(EIONET_RDF + '/languages/lb'),),
-            (IRI(EIONET_RDF + '/languages/lt'),),
-            (IRI(EIONET_RDF + '/languages/lv'),),
-            (IRI(EIONET_RDF + '/languages/me'),),
-            (IRI(EIONET_RDF + '/languages/mk'),),
-            (IRI(EIONET_RDF + '/languages/mt'),),
-            (IRI(EIONET_RDF + '/languages/nl'),),
-            (IRI(EIONET_RDF + '/languages/no'),),
-            (IRI(EIONET_RDF + '/languages/pl'),),
-            (IRI(EIONET_RDF + '/languages/pt'),),
-            (IRI(EIONET_RDF + '/languages/rm'),),
-            (IRI(EIONET_RDF + '/languages/ro'),),
-            (IRI(EIONET_RDF + '/languages/ru'),),
-            (IRI(EIONET_RDF + '/languages/sk'),),
-            (IRI(EIONET_RDF + '/languages/sl'),),
-            (IRI(EIONET_RDF + '/languages/sq'),),
-            (IRI(EIONET_RDF + '/languages/sr'),),
-            (IRI(EIONET_RDF + '/languages/sv'),),
-            (IRI(EIONET_RDF + '/languages/tr'),),
-            (IRI(EIONET_RDF + '/languages/uk'),),
-            (IRI(EIONET_RDF + '/languages/ca'),),
-            (IRI(EIONET_RDF + '/languages/ky'),),
-            (IRI(EIONET_RDF + '/languages/tg'),),
-            (IRI(EIONET_RDF + '/languages/tk'),),
+            (IRI(EIONET_RDF + '/languages/de'),),
         ])
 
     @patch('Products.ZSPARQLMethod.Method.sparql')
-    def test_timeout(self, mock_pycurl):
-        class MockCurl(object):
-            def perform(self):
-                import sparql
-                raise sparql.SparqlException(28, "timeout")
-
-            def setopt(self, value, opt):
-                pass
-
-        def mock_Curl():
-            return MockCurl()
-
-        mock_pycurl.Curl = mock_Curl
+    def test_timeout(self, mock_sparql):
         self.method.query = mock_db.GET_LANGS
-        mock_pycurl.query.side_effect = QueryTimeout
+        mock_sparql.query.side_effect = QueryTimeout
 
         result = self.method.execute()
         if QueryTimeout.__name__ not in result['exception']:
@@ -123,23 +66,15 @@ class QueryTest(unittest.TestCase):
             raise self.failureException, "%s not raised" % MyError.__name__
 
     def test_query_with_arguments(self):
-        self.mock_db.stop()
         self.method.query = mock_db.GET_LANG_BY_NAME
-
         result = self.method.execute(lang_name=sparql.Literal("Danish"))
-
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
-        self.mock_db.start()
-
         self.assertEqual(result['result']['rows'], [(danish_iri,)])
 
     def test_call(self):
-        self.mock_db.stop()
         self.method.query = mock_db.GET_LANG_BY_NAME
         self.method.arg_spec = u"lang_name:n3term"
         result = self.method(lang_name='"Danish"')
-
-        self.mock_db.start()
         self.assertEqual(result[0], [EIONET_RDF+'/languages/da'])
 
 
