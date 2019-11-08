@@ -264,7 +264,7 @@ def run_with_timeout(timeout, func, *args, **kwargs):
     result = {}
     try:
         ret = func(*args, **kwargs)
-    except sparql.SparqlException as e:
+    except sparql.SparqlException as err:
         if err.code == 28:
             raise QueryTimeout
         result['exception'] = "Query timeout. " + err.message
