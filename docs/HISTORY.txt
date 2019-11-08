@@ -3,6 +3,8 @@ Changelog
 
 2.0-dev0 - (unreleased)
 ---------------------------
+* Feature: Python3 compatibility
+  [alecghica refs #110155]
 
 1.9 - (2019-08-26)
 ---------------------------

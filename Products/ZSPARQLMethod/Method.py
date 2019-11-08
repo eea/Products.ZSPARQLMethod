@@ -5,7 +5,6 @@ from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view, view_management_screens
 from OFS.SimpleItem import SimpleItem
-from OFS.History import html_diff, Historical
 from OFS.Cache import Cacheable
 import DateTime
 import sparql
@@ -38,7 +37,7 @@ def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     if REQUEST is not None:
         REQUEST.RESPONSE.redirect(parent.absolute_url() + '/manage_workspace')
 
-class ZSPARQLMethod(SimpleItem, Historical, Cacheable):
+class ZSPARQLMethod(SimpleItem, Cacheable):
     """
     Persistent SPARQL parametrized query.
     """
@@ -47,7 +46,6 @@ class ZSPARQLMethod(SimpleItem, Historical, Cacheable):
     manage_options = (
         ({'label': 'Edit', 'action': 'manage_edit_html'},
         {'label': 'Test', 'action': 'test_html'})
-        + Historical.manage_options
         + SimpleItem.manage_options
         + Cacheable.manage_options)
 
@@ -95,12 +93,6 @@ class ZSPARQLMethod(SimpleItem, Historical, Cacheable):
         arg_values = self.map_arguments(**kwargs)
 
         return interpolate_query_html(self.query, arg_values)
-
-    def manage_historyCompare(self, rev1, rev2, REQUEST,
-                              historyComparisonResults=''):
-        return ZSPARQLMethod.inheritedAttribute('manage_historyCompare')(
-            self, rev1, rev2, REQUEST,
-            historyComparisonResults = html_diff(rev1.query, rev2.query))
 
     security.declareProtected(view, 'execute')
     def execute(self, **arg_values):
@@ -272,11 +264,11 @@ def run_with_timeout(timeout, func, *args, **kwargs):
     result = {}
     try:
         ret = func(*args, **kwargs)
-    except sparql.SparqlException, e:
-        if e.code == 28:
+    except sparql.SparqlException as e:
+        if err.code == 28:
             raise QueryTimeout
-        result['exception'] = "Query timeout. " + e.message
-    except Exception, e:
+        result['exception'] = "Query timeout. " + err.message
+    except Exception as err:
         result['exception'] = "Error. " + traceback.format_exc()
     else:
         result['result'] = ret
@@ -335,7 +327,7 @@ def map_arg_values(arg_spec, arg_data):
     """
     arg_values = {}
     missing = []
-    for name, factory in arg_spec.iteritems():
+    for name, factory in arg_spec.items():
         if name in arg_data:
             arg_values[name] = factory(arg_data[name])
         else:
@@ -350,7 +342,7 @@ def interpolate_query(query_spec, var_data):
     variables, and its values are assumed to be `sparql.RDFTerm` instances.
     """
     from string import Template
-    var_strings = dict( (k, v.n3()) for (k, v) in var_data.iteritems() )
+    var_strings = dict( (k, v.n3()) for (k, v) in var_data.items() )
     return Template(query_spec).substitute(**var_strings)
 
 def html_quote(s):
@@ -363,7 +355,7 @@ def interpolate_query_html(query_spec, var_data):
     place.
     """
     from string import Template
-    var_strings = dict( (k, v.n3()) for (k, v) in var_data.iteritems() )
+    var_strings = dict( (k, v.n3()) for (k, v) in var_data.items() )
     tmpl = Template(html_quote(query_spec))
     def convert(mo): # Simplified version of Template's helper function
         named = mo.group('named') or mo.group('braced')
