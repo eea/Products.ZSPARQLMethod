@@ -193,9 +193,10 @@ def query_and_get_result(*args, **kwargs):
     Helper function that calls `sparql.query` with the given arguments and
     returns its results as an easy-to-cache dictionary.
     """
-    result = sparql.query(*args, timeout = kwargs.get("timeout", 0))
+    result = sparql.query(*args, timeout = kwargs.get("timeout", 0) or 0)
+
     return {
-        'var_names': [unicode(name) for name in result.variables],
+        'var_names': [name for name in result.variables],
         'rows': result.fetchall(),
         'has_result': result._hasResult,
     }
@@ -205,7 +206,7 @@ def raw_query_and_get_result(*args, **kwargs):
     """
     Returns unparsed query results for xml, xmlschema, json formats
     """
-    timeout = kwargs.get("timeout", 0)
+    timeout = kwargs.get("timeout", 0) or 0
     accept = kwargs.get("accept", "application/sparql-results+xml")
     result = sparql.query(*args, timeout=timeout, accept=accept, raw=True)
     return result
