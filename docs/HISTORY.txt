@@ -3,6 +3,10 @@ Changelog
 
 2.0-dev0 - (unreleased)
 ---------------------------
+* Change: Set timeout to 0 if timeout is None and removed unicode entry
+  [iulianpetchesi refs #111217]
+* Feature: Python3 compatibility
+  [alecghica refs #110155]
 
 1.9 - (2019-08-26)
 ---------------------------

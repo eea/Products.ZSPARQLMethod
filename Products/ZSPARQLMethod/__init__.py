@@ -6,10 +6,12 @@ except ImportError:
 
 def initialize(context):
     from AccessControl.Permissions import view_management_screens
-    import Method
+    from Products.ZSPARQLMethod.Method import ZSPARQLMethod
+    from Products.ZSPARQLMethod.Method import manage_addZSPARQLMethod_html
+    from Products.ZSPARQLMethod.Method import manage_addZSPARQLMethod
     context.registerClass(
-        Method.ZSPARQLMethod,
+        ZSPARQLMethod,
         permission=view_management_screens,
-        constructors=(Method.manage_addZSPARQLMethod_html,
-                      Method.manage_addZSPARQLMethod),
+        constructors=(manage_addZSPARQLMethod_html,
+                      manage_addZSPARQLMethod),
     )
