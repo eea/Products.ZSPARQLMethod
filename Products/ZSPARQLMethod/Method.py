@@ -350,8 +350,7 @@ def interpolate_query(query_spec, var_data):
 #            new_arg = '${' + arg[0] + '}'
 #            query_spec = query_spec.replace(arg[0], new_arg)
 
-    var_strings = dict( (k, str(v)) for (k, v) in var_data.items() )
-
+    var_strings = dict( (k, v.n3()) for (k, v) in var_data.items() )
     return Template(query_spec).substitute(**var_strings)
 
 def html_quote(s):
