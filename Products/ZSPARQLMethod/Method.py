@@ -344,10 +344,11 @@ def interpolate_query(query_spec, var_data):
     """
     from string import Template
 
-    for arg in var_data.items():
-        if arg[0] in query_spec:
-            new_arg = '${' + arg[0] + '}'
-            query_spec = query_spec.replace(arg[0], new_arg)
+# related to #111217 - "Fixed query argument replacement."
+#    for arg in var_data.items():
+#        if arg[0] in query_spec:
+#            new_arg = '${' + arg[0] + '}'
+#            query_spec = query_spec.replace(arg[0], new_arg)
 
     var_strings = dict( (k, str(v)) for (k, v) in var_data.items() )
 
