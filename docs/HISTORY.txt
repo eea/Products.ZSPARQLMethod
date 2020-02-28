@@ -1,6 +1,17 @@
 Changelog
 =========
 
+2.0 - (2020-02-26)
+---------------------------
+* Change: Set timeout to 0 if timeout is None and removed unicode entry
+  [iulianpetchesi refs #111217]
+* Feature: Python3 compatibility
+  [alecghica refs #110155]
+* Feature: merged source code so it now works on both Python 2 and Python 3
+  [alecghica refs #110159]
+* Feature: updated Jenkins pipeline
+  [alecghica refs #110159]
+
 1.9 - (2019-08-26)
 ---------------------------
 * Change: Fixed mock tests
