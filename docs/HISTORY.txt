@@ -3,6 +3,8 @@ Changelog
 
 2.2-dev0 - (unreleased)
 ---------------------------
+* Feature: fixed unittest on Python3
+  [alecghica refs #111217]
 
 2.1 - (2020-03-03)
 ---------------------------

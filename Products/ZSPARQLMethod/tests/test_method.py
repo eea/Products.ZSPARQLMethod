@@ -53,7 +53,7 @@ class QueryTest(unittest.TestCase):
 
         result = self.method.execute()
         if QueryTimeout.__name__ not in result['exception']:
-            raise self.failureException, "%s not raised" % QueryTimeout.__name__
+            raise self.failureException("%s not raised" % QueryTimeout.__name__)
 
     @patch('Products.ZSPARQLMethod.Method.sparql')
     def test_error(self, mock_sparql):
@@ -63,7 +63,7 @@ class QueryTest(unittest.TestCase):
 
         result = self.method.execute()
         if MyError.__name__ not in result['exception']:
-            raise self.failureException, "%s not raised" % MyError.__name__
+            raise self.failureException("%s not raised" % MyError.__name__)
 
     def test_query_with_arguments(self):
         self.method.query = mock_db.GET_LANG_BY_NAME
