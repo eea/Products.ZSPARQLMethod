@@ -11,11 +11,11 @@ install_requires = ['sparql-client', 'eventlet']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
-test_requires = ['mock', 'mechanize==0.2.5', 'cssselect', 'webob']
+TEST_REQUIRES = ['mock', 'mechanize==0.2.5', 'cssselect', 'webob']
 if sys.version_info[0] == 2:
-    test_requires += ['wsgi_intercept==0.4']
+    TEST_REQUIRES += ['wsgi_intercept==0.4']
 else:
-    test_requires += ['wsgi_intercept==1.9.2']
+    TEST_REQUIRES += ['wsgi_intercept==1.9.2']
 
 docs = open('README.rst').read() + "\n" + \
        open(os.path.join("docs", "HISTORY.txt")).read()
@@ -31,9 +31,12 @@ setup(
         "Framework :: Plone :: 4.1",
         "Framework :: Plone :: 4.2",
         "Framework :: Plone :: 4.3",
+        "Framework :: Plone :: 5.2",
         "Programming Language :: Zope",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
@@ -49,7 +52,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
-    extras_require={
-        'test': test_requires
-    },
+    extras_require={"test": TEST_REQUIRES},
+    entry_points="""
+      # -*- Entry points: -*-
+      [z3c.autoinclude.plugin]
+      target = plone
+      """,
 )
