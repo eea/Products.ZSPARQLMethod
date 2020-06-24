@@ -7,7 +7,7 @@ NAME = 'Products.ZSPARQLMethod'
 PATH = NAME.split('.') + ['version.txt']
 VERSION = open(join(*PATH)).read().strip()
 
-install_requires = ['sparql-client', 'eventlet']
+install_requires = ['sparql-client', 'eventlet', 'six']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
