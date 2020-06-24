@@ -11,7 +11,7 @@ install_requires = ['sparql-client', 'eventlet']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
-test_requires = ['mock', 'mechanize==0.2.5', 'cssselect', 'webob',]
+test_requires = ['mock', 'mechanize==0.2.5', 'cssselect', 'webob']
 if sys.version_info[0] == 2:
     test_requires += ['wsgi_intercept==0.4']
 else:

@@ -1,6 +1,6 @@
 import unittest
 from mock import Mock, patch
-import mock_db
+import Products.ZSPARQLMethod.tests.mock_db as mock_db
 
 import sparql
 

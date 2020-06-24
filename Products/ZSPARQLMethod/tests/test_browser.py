@@ -7,7 +7,7 @@ from webob import Request
 from Products.ZSPARQLMethod.Method import sparql
 from Products.ZSPARQLMethod.Method import ZSPARQLMethod
 from test_method import EIONET_RDF
-import mock_db
+import Products.ZSPARQLMethod.tests.mock_db as mock_db
 
 try:
     import simplejson as json
