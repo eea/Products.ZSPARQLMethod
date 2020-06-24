@@ -11,6 +11,12 @@ install_requires = ['sparql-client', 'eventlet']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
 
+test_requires = ['mock', 'mechanize==0.2.5', 'cssselect', 'webob',]
+if sys.version_info[0] == 2:
+    test_requires += ['wsgi_intercept==0.5']
+else:
+    test_requires += ['wsgi_intercept==1.9.2']
+
 docs = open('README.rst').read() + "\n" + \
        open(os.path.join("docs", "HISTORY.txt")).read()
 
@@ -44,12 +50,6 @@ setup(
     zip_safe=False,
     install_requires=install_requires,
     extras_require={
-        'test': [
-            'mock',
-            'mechanize==0.2.5',
-            'wsgi_intercept==0.4',
-            'cssselect',
-            'webob',
-        ]
+        'test': test_requires
     },
 )
