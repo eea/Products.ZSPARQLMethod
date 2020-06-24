@@ -13,7 +13,7 @@ if sys.version_info < (2, 6):
 
 test_requires = ['mock', 'mechanize==0.2.5', 'cssselect', 'webob',]
 if sys.version_info[0] == 2:
-    test_requires += ['wsgi_intercept==0.5']
+    test_requires += ['wsgi_intercept==0.4']
 else:
     test_requires += ['wsgi_intercept==1.9.2']
 
