@@ -28,6 +28,7 @@ sparql_converters = {
 
 manage_addZSPARQLMethod_html = PageTemplateFile('zpt/method_add.zpt', globals())
 
+
 def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     """ Create a new ZSPARQLMethod """
     if not endpoint_url:
@@ -37,6 +38,7 @@ def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     parent._setObject(id, ob)
     if REQUEST is not None:
         REQUEST.RESPONSE.redirect(parent.absolute_url() + '/manage_workspace')
+
 
 class ZSPARQLMethod(SimpleItem, Cacheable):
     """
@@ -254,6 +256,7 @@ class MethodResult(object):
 
 import traceback
 
+
 def run_with_timeout(timeout, func, *args, **kwargs):
     """
     Run the given callable in a separate thread; if it does not return within
@@ -292,6 +295,7 @@ RDF_TERM_FACTORY = {
     'boolean':  lambda v: sparql.Literal(v, sparql.XSD_BOOLEAN),
 }
 
+
 def parse_arg_spec(raw_arg_spec):
     """
     Parse the arguments for a ZSPARQLMethod. `raw_arg_spec` should be a
@@ -322,6 +326,7 @@ def parse_arg_spec(raw_arg_spec):
         arg_spec[str(name)] = factory
     return arg_spec
 
+
 def map_arg_values(arg_spec, arg_data):
     """
     Box all values in `arg_data` according to `arg_spec`. Returns a tuple
@@ -336,6 +341,7 @@ def map_arg_values(arg_spec, arg_data):
             missing.append(name)
 
     return missing, arg_values
+
 
 def interpolate_query(query_spec, var_data):
     """
@@ -354,8 +360,10 @@ def interpolate_query(query_spec, var_data):
     var_strings = dict( (k, v.n3()) for (k, v) in var_data.items() )
     return Template(query_spec).substitute(**var_strings)
 
+
 def html_quote(s):
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
 
 def interpolate_query_html(query_spec, var_data):
     """
@@ -386,6 +394,7 @@ def interpolate_query_html(query_spec, var_data):
             tmpl._invalid(mo)
         raise ValueError('Unrecognized named group in pattern', tmpl.pattern)
     return tmpl.pattern.sub(convert, tmpl.template)
+
 
 def rdf_values_to_json(value):
     if isinstance(value, sparql.RDFTerm):
