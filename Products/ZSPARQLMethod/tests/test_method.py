@@ -2,6 +2,7 @@ import unittest
 from mock import Mock, patch
 import Products.ZSPARQLMethod.tests.mock_db as mock_db
 
+import six
 import sparql
 
 from Products.ZSPARQLMethod.Method import QueryTimeout
@@ -214,7 +215,10 @@ class ResultsUnpackingTest(unittest.TestCase):
 
     def test_iter(self):
         result = self.do_query([ [sparql.Literal("hello")] ])
-        self.assertEqual(iter(result).next()[0], "hello")
+        if six.PY2:
+            self.assertEqual(iter(result).next()[0], "hello")
+        else:
+            self.assertEqual(next(iter(result))[0], "hello")
 
     def test_length(self):
         result = self.do_query([

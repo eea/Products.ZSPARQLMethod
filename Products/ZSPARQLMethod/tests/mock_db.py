@@ -1,5 +1,6 @@
 from os import path
 from Products.ZSPARQLMethod.Method import sparql
+import six
 
 GET_LANGS = """\
 SELECT ?lang_url WHERE {
@@ -51,7 +52,13 @@ class MockResponse(object):
 
 class MockQuery(sparql._Query):
     def _get_response(self, opener, request, buf, timeout):
-        self.querystring = request.get_data()
+        if six.PY2:
+            self.querystring = request.get_data()
+        else:
+            if not request.data:
+                self.querystring = request.selector.split('?')[1]
+            else:
+                self.querystring = request.data
         return MockResponse()
 
     def _read_response(self, response, buf, timeout):
