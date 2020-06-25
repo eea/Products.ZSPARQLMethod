@@ -85,8 +85,12 @@ class MapArgumentsTest(unittest.TestCase):
         missing, result = map_arg_values(parse_arg_spec(raw_arg_spec), arg_data)
         self.assertEqual(missing, [])
         self.assertEqual(result, expected)
-        self.assertEqual(map(type, result.values()),
-                         map(type, expected.values()))
+        if six.PY2:
+            self.assertEqual(map(type, result.values()),
+                             map(type, expected.values()))
+        else:
+            self.assertEqual(set(map(type, result.values())),
+                             set(map(type, expected.values())))
 
     def test_map_zero(self):
         self._test(u'', (), {})
