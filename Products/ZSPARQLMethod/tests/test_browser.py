@@ -1,7 +1,6 @@
 import unittest
 from mock import patch
 import wsgi_intercept
-import wsgi_intercept.mechanize_intercept
 from zope_wsgi import WsgiApp, css, csstext, parse_html
 from webob import Request
 from Products.ZSPARQLMethod.Method import sparql
@@ -13,6 +12,11 @@ try:
     import simplejson as json
 except ImportError:
     import json
+
+try:
+    import wsgi_intercept.mechanize_intercept as mechanize_intercept
+except ImportError:
+    import mechanize as mechanize_intercept
 
 
 class BrowserTest(unittest.TestCase):
