@@ -6,6 +6,7 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view, view_management_screens
 from OFS.SimpleItem import SimpleItem
 from OFS.Cache import Cacheable
+from sparql import SparqlException
 import DateTime
 import sparql
 
@@ -265,7 +266,7 @@ def run_with_timeout(timeout, func, *args, **kwargs):
     result = {}
     try:
         ret = func(*args, **kwargs)
-    except sparql.SparqlException as err:
+    except SparqlException as err:
         if err.code == 28:
             raise QueryTimeout
         result['exception'] = "Query timeout. " + err.message
