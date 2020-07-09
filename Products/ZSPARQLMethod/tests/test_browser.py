@@ -30,7 +30,8 @@ class BrowserTest(unittest.TestCase):
 
         wsgi_intercept.add_wsgi_intercept('test', 80, lambda: self.app)
         self.browser = mechanize_intercept.Browser()
-
+        # disable robots
+        self.browser.set_handle_robots(False)
         self.validate_patch = patch('AccessControl.SecurityManagement'
                                     '.SecurityManager.validate')
         self.validate_patch.start().return_value = True
