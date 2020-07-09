@@ -1,11 +1,11 @@
 import unittest
 from mock import patch
 import wsgi_intercept
-from zope_wsgi import WsgiApp, css, csstext, parse_html
+from Products.ZSPARQLMethod.tests.zope_wsgi import WsgiApp, css, csstext, parse_html
 from webob import Request
 from Products.ZSPARQLMethod.Method import sparql
 from Products.ZSPARQLMethod.Method import ZSPARQLMethod
-from test_method import EIONET_RDF
+from Products.ZSPARQLMethod.tests.test_method import EIONET_RDF
 import Products.ZSPARQLMethod.tests.mock_db as mock_db
 
 try:
