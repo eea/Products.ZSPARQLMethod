@@ -15,8 +15,19 @@ except ImportError:
 
 try:
     import wsgi_intercept.mechanize_intercept as mechanize_intercept
+    Browser = mechanize_intercept.Browser
 except ImportError:
-    import mechanize as mechanize_intercept
+    from mechanize import Browser as MechanizeBrowser
+    from wsgi_intercept.urllib_intercept import WSGI_HTTPHandler, WSGI_HTTPSHandler
+
+    class Browser(MechanizeBrowser):
+        """
+        A version of the mechanize browser class that
+        installs the WSGI intercept handler
+        """
+        handler_classes = MechanizeBrowser.handler_classes.copy()
+        handler_classes['http'] = WSGI_HTTPHandler
+        handler_classes['https'] = WSGI_HTTPSHandler
 
 
 class BrowserTest(unittest.TestCase):
@@ -29,7 +40,7 @@ class BrowserTest(unittest.TestCase):
         self.app = WsgiApp(self.method)
 
         wsgi_intercept.add_wsgi_intercept('test', 80, lambda: self.app)
-        self.browser = mechanize_intercept.Browser()
+        self.browser = Browser()
         # disable robots
         self.browser.set_handle_robots(False)
         self.validate_patch = patch('AccessControl.SecurityManagement'
