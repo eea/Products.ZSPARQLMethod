@@ -25,14 +25,15 @@ setup(
     version=VERSION,
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        "Framework :: Zope2",
         "Framework :: Plone",
         "Framework :: Plone :: 4.0",
         "Framework :: Plone :: 4.1",
         "Framework :: Plone :: 4.2",
         "Framework :: Plone :: 4.3",
         "Framework :: Plone :: 5.2",
-        "Programming Language :: Zope",
+        "Framework :: Zope",
+        "Framework :: Zope :: 2",
+        "Framework :: Zope :: 4",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.6",
