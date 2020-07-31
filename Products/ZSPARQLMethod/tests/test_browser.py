@@ -41,7 +41,7 @@ class BrowserTest(unittest.TestCase):
         self.app = WsgiApp(self.method)
 
         wsgi_intercept.add_wsgi_intercept('test', 80, lambda: self.app)
-        self.browser = Browser(allow_xhtml=True)
+        self.browser = Browser()
         # disable robots
         self.browser.set_handle_robots(False)
         self.validate_patch = patch('AccessControl.SecurityManagement'
