@@ -22,14 +22,14 @@
   <tr>
     <td class="form-label" i18n:translate="">Title</td>
     <td>
-      <input type="text" name="title:utf8:ustring" size="50"
+      <input type="text" name="title" size="50"
              tal:attributes="value here/title"/>
     </td>
   </tr>
 
   <tr>
     <td class="form-label" i18n:translate="">SPARQL endpoint URL</td>
-    <td><input type="text" name="endpoint_url:utf8:ustring" size="50"
+    <td><input type="text" name="endpoint_url" size="50"
                tal:attributes="value here/endpoint_url"/></td>
   </tr>
 
@@ -41,13 +41,13 @@
 
   <tr>
     <td class="form-label" i18n:translate="">Arguments</td>
-    <td><input type="text" name="arg_spec:utf8:ustring" size="50"
+    <td><input type="text" name="arg_spec" size="50"
                tal:attributes="value here/arg_spec"/></td>
   </tr>
 
 </table>
 
-<textarea name="query:utf8:ustring"
+<textarea name="query"
           class="sparql" rows="24" cols="120"
           tal:content="here/query"></textarea>
 

@@ -1,10 +1,5 @@
 import sys
 from ZPublisher.HTTPResponse import HTTPResponse
-# from http.client import HTTPResponse as newHTTPResponse
-# from zope.publisher.http import HTTPRequest, HTTPResponse
-# from ZPublisher.HTTPResponse import WSGIResponse
-# import pdb; pdb.set_trace()
-# from ZServer.HTTPResponse import ZServerHTTPResponse
 from ZPublisher.Request import Request
 
 from webob import Response
@@ -23,7 +18,6 @@ except ImportError:
 
 def get_zope_request(webob_request):
     outstream = StringIO()
-    # response = ZServerHTTPResponse(stdout=outstream, stderr=sys.stderr)
     response = HTTPResponse(stdout=outstream, stderr=sys.stderr)
     environ = webob_request.environ
     zope_request = Request(environ['wsgi.input'], environ, response)

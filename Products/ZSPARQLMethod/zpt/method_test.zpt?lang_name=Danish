@@ -55,7 +55,7 @@
                tal:attributes="name input_name; value prev_value"/>
       </td>
     </tr>
-    <input type="text" id="lang_name" name="lang_name" value="" i18n:attributes="value"/>
+    <input type="text" id="lang_name" name="lang_name" value="Danish" i18n:attributes="value"/>
     <tr><td colspan="2"><input type="submit" value="Execute" i18n:attributes="value"/></td></tr>
   </table>
 </form>

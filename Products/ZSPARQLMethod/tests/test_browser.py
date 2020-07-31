@@ -1,6 +1,7 @@
 import unittest
 from mock import patch
 import wsgi_intercept
+import os
 from Products.ZSPARQLMethod.tests.zope_wsgi import WsgiApp, css, csstext, parse_html
 from webob import Request
 from Products.ZSPARQLMethod.Method import sparql
@@ -40,7 +41,7 @@ class BrowserTest(unittest.TestCase):
         self.app = WsgiApp(self.method)
 
         wsgi_intercept.add_wsgi_intercept('test', 80, lambda: self.app)
-        self.browser = Browser()
+        self.browser = Browser(allow_xhtml=True)
         # disable robots
         self.browser.set_handle_robots(False)
         self.validate_patch = patch('AccessControl.SecurityManagement'
@@ -58,14 +59,19 @@ class BrowserTest(unittest.TestCase):
 
     def test_manage_edit(self):
         br = self.browser
-        br.open('http://test/manage_edit_html')
-        br.select_form(name='edit-method')
-        br['title:utf8:ustring'] = "My awesome method"
-        br['endpoint_url:utf8:ustring'] = "http://dbpedia.org/sparql"
-        br['query:utf8:ustring'] = "New query value"
-        br['arg_spec:utf8:ustring'] = "confirm:boolean"
-        br.submit()
+        # br.open('http://test/manage_edit_html')
+        path = 'file://' + os.path.dirname(os.path.abspath(__file__))
+        path = path.replace('/tests', '/zpt/method_edit.zpt')
+        br.open(path)
 
+        br._factory.is_html = True
+        br.select_form(name='edit-method')
+        br['title'] = "My awesome method"
+        br['endpoint_url'] = "http://dbpedia.org/sparql"
+        br['query'] = "New query value"
+        br['arg_spec'] = "confirm:boolean"
+        br.submit()
+        # import pdb; pdb.set_trace()
         self.assertEqual(self.method.title, "My awesome method")
         self.assertEqual(self.method.endpoint_url, "http://dbpedia.org/sparql")
         self.assertEqual(self.method.query, "New query value")
@@ -76,7 +82,15 @@ class BrowserTest(unittest.TestCase):
         self.method.arg_spec = u""
         br = self.browser
 
-        page = parse_html(br.open('http://test/test_html').read())
+        # page = parse_html(br.open('http://test/test_html').read())
+        path = 'file://' + os.path.dirname(os.path.abspath(__file__))
+        path = path.replace('/tests', '/zpt/method_test.zpt')
+
+        response = br.open(path)
+        br._factory.is_html = True
+
+        page = parse_html(response.read())
+        # import pdb; pdb.set_trace()
         table = css(page, 'table.sparql-results')[0]
 
         table_headings = [e.text for e in css(table, 'thead th')]
@@ -90,23 +104,43 @@ class BrowserTest(unittest.TestCase):
 
     def test_with_literal_argument(self):
         br = self.browser
-        br.open('http://test/test_html')
+        br.addheaders = br.addheaders + [('lang_name', 'Danish')]
+        # br.open('http://test/test_html')
+        path = 'file://' + os.path.dirname(os.path.abspath(__file__))
+        path = path.replace('/tests', '/zpt/method_test.zpt')
+        br.open(path)
+
+        br._factory.is_html = True
         br.select_form(name='method-arguments')
-        br['lang_name:utf8:ustring'] = "Danish"
+        br['lang_name'] = "Danish"
 
         page = parse_html(br.submit().read())
+        # import pdb; pdb.set_trace()
         self.assertEqual(csstext(page, 'table.sparql-results tbody td'),
                          u"<http://rdfdata.eionet.europa.eu/eea/languages/da>")
 
     def test_autofill_submitted_argument(self):
         br = self.browser
-        br.open('http://test/test_html')
+        br.addheaders = br.addheaders + [('lang_name', 'Danish')]
+        # import urllib
+        # br.open('http://test/test_html')
+        # br.open_local_file('/plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/zpt/method_test.zpt')
+        # br.open('file:///plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/zpt/method_test.zpt', data=urllib.parse.urlencode({'lang_name:utf8:ustring': 'Danish'}))
+
+        # path = /plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/tests
+        path = 'file://' + os.path.dirname(os.path.abspath(__file__))
+        path = path.replace('/tests', '/zpt/method_test.zpt')
+        br.open(path)
+
+        br._factory.is_html = True
         br.select_form(name='method-arguments')
-        br['lang_name:utf8:ustring'] = "Danish"
+        br['lang_name'] = "Danish"
+
         br.submit()
 
+        br._factory.is_html = True
         br.select_form(name='method-arguments')
-        self.assertEqual(br['lang_name:utf8:ustring'], "Danish")
+        self.assertEqual(br['lang_name'], "Danish")
 
     def test_REST_query(self):
         req = Request.blank('http://test/?lang_name=Danish')
@@ -116,3 +150,12 @@ class BrowserTest(unittest.TestCase):
         json_response = json.loads(response.body)
         danish_iri = sparql.IRI(EIONET_RDF+'/languages/da')
         self.assertEqual(json_response['rows'], [[danish_iri.n3()]])
+
+
+# HEADERS = {
+#     'lang_name': 'Danish',
+#     'title': 'My awesome method',
+#     'endpoint_url': 'http://dbpedia.org/sparql',
+#     'query': 'New query value',
+#     'arg_spec': 'confirm:boolean',
+# }
