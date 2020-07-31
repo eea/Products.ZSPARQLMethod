@@ -132,7 +132,7 @@ class BrowserTest(unittest.TestCase):
         br.addheaders = br.addheaders + [('lang_name', 'Danish'), ('filename', path)]
         # br.open(path)
         br.open('http://test/test_html')
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         br._factory.is_html = True
         br.select_form(name='method-arguments')
         br['lang_name'] = "Danish"
