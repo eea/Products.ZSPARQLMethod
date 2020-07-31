@@ -121,17 +121,18 @@ class BrowserTest(unittest.TestCase):
 
     def test_autofill_submitted_argument(self):
         br = self.browser
-        br.addheaders = br.addheaders + [('lang_name', 'Danish')]
         # import urllib
         # br.open('http://test/test_html')
         # br.open_local_file('/plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/zpt/method_test.zpt')
         # br.open('file:///plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/zpt/method_test.zpt', data=urllib.parse.urlencode({'lang_name:utf8:ustring': 'Danish'}))
 
-        # path = /plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/tests
-        path = 'file://' + os.path.dirname(os.path.abspath(__file__))
+        # # path = /plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/tests
+        path = os.path.dirname(os.path.abspath(__file__))
         path = path.replace('/tests', '/zpt/method_test.zpt')
-        br.open(path)
-
+        br.addheaders = br.addheaders + [('lang_name', 'Danish'), ('filename', path)]
+        # br.open(path)
+        br.open('http://test/test_html')
+        import pdb; pdb.set_trace()
         br._factory.is_html = True
         br.select_form(name='method-arguments')
         br['lang_name'] = "Danish"
@@ -152,10 +153,10 @@ class BrowserTest(unittest.TestCase):
         self.assertEqual(json_response['rows'], [[danish_iri.n3()]])
 
 
-# HEADERS = {
-#     'lang_name': 'Danish',
-#     'title': 'My awesome method',
-#     'endpoint_url': 'http://dbpedia.org/sparql',
-#     'query': 'New query value',
-#     'arg_spec': 'confirm:boolean',
-# }
+HEADERS = {
+    'lang_name': 'Danish',
+    'title': 'My awesome method',
+    'endpoint_url': 'http://dbpedia.org/sparql',
+    'query': 'New query value',
+    'arg_spec': 'confirm:boolean'
+}

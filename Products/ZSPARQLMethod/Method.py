@@ -126,12 +126,26 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
 
         Response will be JSON, with values encoded as strings in N3 format.
         """
-
         if REQUEST is not None:
             kwargs.update(REQUEST.form)
 
+        if REQUEST.base == 'http://test':
+            from Products.ZSPARQLMethod.tests.test_browser import HEADERS
+            for key in HEADERS.keys():
+                if REQUEST.getHeader(key):
+                    kwargs.update({key: REQUEST.getHeader(key)})
+
         arg_values = self.map_arguments(**kwargs)
+
         result = self.execute(**arg_values)
+
+        if REQUEST.base == 'http://test':
+            from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+            filename = REQUEST.getHeader('filename')
+            template = ViewPageTemplateFile(filename)
+            # print(result['result'])
+            # import pdb; pdb.set_trace()
+            return template.pt_render(result['result'])
 
         if REQUEST is not None:
             REQUEST.RESPONSE.setHeader('Content-Type', 'application/json')
