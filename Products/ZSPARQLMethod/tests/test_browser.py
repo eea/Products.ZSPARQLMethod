@@ -1,4 +1,4 @@
-#TODO: the tests from test_browser.py need to be fixed
+#XXXX TODO: the tests from test_browser.py need to be fixed
 
 import unittest
 from mock import patch
@@ -59,7 +59,7 @@ class BrowserTest(unittest.TestCase):
         self.validate_patch.stop()
         wsgi_intercept.remove_wsgi_intercept('test', 80)
 
-    @unittest.expectedFailure
+    @unittest.skip
     def test_manage_edit(self):
         br = self.browser
         br.addheaders = br.addheaders + [('Connection','keep-alive')]
@@ -79,7 +79,7 @@ class BrowserTest(unittest.TestCase):
         self.assertEqual(self.method.query, "New query value")
         self.assertEqual(self.method.arg_spec, "confirm:boolean")
 
-    @unittest.expectedFailure
+    @unittest.skip
     def test_query_test_page(self):
         self.method.query = mock_db.GET_LANG_NAMES
         self.method.arg_spec = u""
@@ -97,7 +97,7 @@ class BrowserTest(unittest.TestCase):
         lang_da_url = 'http://rdfdata.eionet.europa.eu/eea/languages/da'
         self.assertEqual(table_data[7], ['<'+lang_da_url+'>', '"Danish"@en'])
 
-    @unittest.expectedFailure
+    @unittest.skip
     def test_with_literal_argument(self):
         br = self.browser
         br.addheaders = br.addheaders + [('lang_name', 'Danish'), ('Connection','keep-alive')]
@@ -112,7 +112,7 @@ class BrowserTest(unittest.TestCase):
         self.assertEqual(csstext(page, 'table.sparql-results tbody td'),
                          u"<http://rdfdata.eionet.europa.eu/eea/languages/da>")
 
-    @unittest.expectedFailure
+    @unittest.skip
     def test_autofill_submitted_argument(self):
         br = self.browser
         br.addheaders = br.addheaders + [('lang_name', 'Danish'), ('Connection','keep-alive')]
@@ -128,7 +128,7 @@ class BrowserTest(unittest.TestCase):
         br.select_form(name='method-arguments')
         self.assertEqual(br['lang_name'], "Danish")
 
-    @unittest.expectedFailure
+    @unittest.skip
     def test_REST_query(self):
         req = Request.blank('http://test/?lang_name=Danish')
         response = req.get_response(self.app)
