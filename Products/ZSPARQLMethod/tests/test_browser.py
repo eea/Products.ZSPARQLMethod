@@ -1,7 +1,6 @@
 import unittest
 from mock import patch
 import wsgi_intercept
-import os
 from Products.ZSPARQLMethod.tests.zope_wsgi import WsgiApp, css, csstext, parse_html
 from webob import Request
 from Products.ZSPARQLMethod.Method import sparql
