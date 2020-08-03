@@ -59,10 +59,9 @@ class BrowserTest(unittest.TestCase):
 
     def test_manage_edit(self):
         br = self.browser
-        # br.open('http://test/manage_edit_html')
-        path = 'file://' + os.path.dirname(os.path.abspath(__file__))
-        path = path.replace('/tests', '/zpt/method_edit.zpt')
-        br.open(path)
+        br.addheaders = br.addheaders + [('Connection','keep-alive')]
+
+        br.open('http://test/manage_edit_html')
 
         br._factory.is_html = True
         br.select_form(name='edit-method')
@@ -71,7 +70,7 @@ class BrowserTest(unittest.TestCase):
         br['query'] = "New query value"
         br['arg_spec'] = "confirm:boolean"
         br.submit()
-        # import pdb; pdb.set_trace()
+
         self.assertEqual(self.method.title, "My awesome method")
         self.assertEqual(self.method.endpoint_url, "http://dbpedia.org/sparql")
         self.assertEqual(self.method.query, "New query value")
@@ -82,15 +81,7 @@ class BrowserTest(unittest.TestCase):
         self.method.arg_spec = u""
         br = self.browser
 
-        # page = parse_html(br.open('http://test/test_html').read())
-        path = 'file://' + os.path.dirname(os.path.abspath(__file__))
-        path = path.replace('/tests', '/zpt/method_test.zpt')
-
-        response = br.open(path)
-        br._factory.is_html = True
-
-        page = parse_html(response.read())
-        # import pdb; pdb.set_trace()
+        page = parse_html(br.open('http://test/test_html').read())
         table = css(page, 'table.sparql-results')[0]
 
         table_headings = [e.text for e in css(table, 'thead th')]
@@ -104,35 +95,23 @@ class BrowserTest(unittest.TestCase):
 
     def test_with_literal_argument(self):
         br = self.browser
-        br.addheaders = br.addheaders + [('lang_name', 'Danish')]
-        # br.open('http://test/test_html')
-        path = 'file://' + os.path.dirname(os.path.abspath(__file__))
-        path = path.replace('/tests', '/zpt/method_test.zpt')
-        br.open(path)
+        br.addheaders = br.addheaders + [('lang_name', 'Danish'), ('Connection','keep-alive')]
+
+        br.open('http://test/test_html')
 
         br._factory.is_html = True
         br.select_form(name='method-arguments')
         br['lang_name'] = "Danish"
 
         page = parse_html(br.submit().read())
-        # import pdb; pdb.set_trace()
         self.assertEqual(csstext(page, 'table.sparql-results tbody td'),
                          u"<http://rdfdata.eionet.europa.eu/eea/languages/da>")
 
     def test_autofill_submitted_argument(self):
         br = self.browser
-        # import urllib
-        # br.open('http://test/test_html')
-        # br.open_local_file('/plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/zpt/method_test.zpt')
-        # br.open('file:///plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/zpt/method_test.zpt', data=urllib.parse.urlencode({'lang_name:utf8:ustring': 'Danish'}))
-
-        # # path = /plone/instance/src/Products.ZSPARQLMethod/Products/ZSPARQLMethod/tests
-        path = os.path.dirname(os.path.abspath(__file__))
-        path = path.replace('/tests', '/zpt/method_test.zpt')
-        br.addheaders = br.addheaders + [('lang_name', 'Danish'), ('filename', path)]
-        # br.open(path)
+        br.addheaders = br.addheaders + [('lang_name', 'Danish'), ('Connection','keep-alive')]
         br.open('http://test/test_html')
-        # import pdb; pdb.set_trace()
+
         br._factory.is_html = True
         br.select_form(name='method-arguments')
         br['lang_name'] = "Danish"

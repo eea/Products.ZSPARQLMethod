@@ -1,6 +1,7 @@
 from time import time
 from datetime import datetime
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view, view_management_screens
@@ -27,6 +28,7 @@ sparql_converters = {
 
 
 manage_addZSPARQLMethod_html = PageTemplateFile('zpt/method_add.zpt', globals())
+template_add_SPARQL = ViewPageTemplateFile('zpt/method_add.zpt', globals())
 
 
 def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
@@ -61,7 +63,7 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
 
     icon = 'misc_/ZSPARQLMethod/method.gif'
 
-    def __init__(self, id, title, endpoint_url):
+    def __init__(self, id, title, endpoint_url, request=None, context=None):
         super(ZSPARQLMethod, self).__init__()
         self._setId(id)
         self.title = title
@@ -69,9 +71,12 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         self.timeout = None
         self.arg_spec = ""
         self.query = ""
+        self.request = request
+        self.context = context
 
     security.declareProtected(view_management_screens, 'manage_edit_html')
     manage_edit_html = PageTemplateFile('zpt/method_edit.zpt', globals())
+    template_edit = ViewPageTemplateFile('zpt/method_edit.zpt', globals())
 
     security.declareProtected(view_management_screens, 'manage_edit')
     def manage_edit(self, REQUEST):
@@ -117,6 +122,7 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         return result
 
     _test_html = PageTemplateFile('zpt/method_test.zpt', globals())
+    _test_template = ViewPageTemplateFile('zpt/method_test.zpt', globals())
 
     def index_html(self, REQUEST=None, **kwargs):
         """
@@ -134,18 +140,12 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
             for key in HEADERS.keys():
                 if REQUEST.getHeader(key):
                     kwargs.update({key: REQUEST.getHeader(key)})
+            REQUEST.form.update(kwargs)
+            return self.test_html(REQUEST)
 
         arg_values = self.map_arguments(**kwargs)
 
         result = self.execute(**arg_values)
-
-        if REQUEST.base == 'http://test':
-            from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-            filename = REQUEST.getHeader('filename')
-            template = ViewPageTemplateFile(filename)
-            # print(result['result'])
-            # import pdb; pdb.set_trace()
-            return template.pt_render(result['result'])
 
         if REQUEST is not None:
             REQUEST.RESPONSE.setHeader('Content-Type', 'application/json')
@@ -192,7 +192,8 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
             'arg_spec': arg_spec,
             'error': error,
         }
-        return self._test_html(REQUEST, **options)
+        self.request = REQUEST
+        return self._test_template(REQUEST, **options)
 
     # __call__ requires the "View" permission, see __ac_permissions__ above.
     def __call__(self, **kwargs):
