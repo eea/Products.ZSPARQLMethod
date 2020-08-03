@@ -34,6 +34,8 @@ except ImportError:
 
 class BrowserTest(unittest.TestCase):
     """"""
+    __name__ = 'BrowserTest'
+
     def setUp(self):
         self.method = ZSPARQLMethod('sq', "Test Method", "")
         self.method.endpoint_url = "https://cr.eionet.europa.eu/sparql"
