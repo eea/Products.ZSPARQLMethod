@@ -135,13 +135,14 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         if REQUEST is not None:
             kwargs.update(REQUEST.form)
 
-        if REQUEST.base == 'http://test':
-            from Products.ZSPARQLMethod.tests.test_browser import HEADERS
-            for key in HEADERS.keys():
-                if REQUEST.getHeader(key):
-                    kwargs.update({key: REQUEST.getHeader(key)})
-            REQUEST.form.update(kwargs)
-            return self.test_html(REQUEST)
+        # TODO: the tests from test_browser.py need to be fixed
+        # if REQUEST.base == 'http://test':
+        #     from Products.ZSPARQLMethod.tests.test_browser import HEADERS
+        #     for key in HEADERS.keys():
+        #         if REQUEST.getHeader(key):
+        #             kwargs.update({key: REQUEST.getHeader(key)})
+        #     REQUEST.form.update(kwargs)
+        #     return self.test_html(REQUEST)
 
         arg_values = self.map_arguments(**kwargs)
 
