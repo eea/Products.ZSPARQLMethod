@@ -7,9 +7,15 @@ NAME = 'Products.ZSPARQLMethod'
 PATH = NAME.split('.') + ['version.txt']
 VERSION = open(join(*PATH)).read().strip()
 
-install_requires = ['sparql-client', 'eventlet']
+install_requires = ['sparql-client', 'eventlet', 'six']
 if sys.version_info < (2, 6):
     install_requires += ['simplejson']
+
+TEST_REQUIRES = ['mock', 'cssselect', 'webob']
+if sys.version_info[0] == 2:
+    TEST_REQUIRES += ['mechanize==0.2.5', 'wsgi_intercept==0.4']
+else:
+    TEST_REQUIRES += ['mechanize==0.4.5', 'wsgi_intercept==1.9.2']
 
 docs = open('README.rst').read() + "\n" + \
        open(os.path.join("docs", "HISTORY.txt")).read()
@@ -19,15 +25,19 @@ setup(
     version=VERSION,
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        "Framework :: Zope2",
         "Framework :: Plone",
         "Framework :: Plone :: 4.0",
         "Framework :: Plone :: 4.1",
         "Framework :: Plone :: 4.2",
         "Framework :: Plone :: 4.3",
-        "Programming Language :: Zope",
+        "Framework :: Plone :: 5.2",
+        "Framework :: Zope",
+        "Framework :: Zope :: 2",
+        "Framework :: Zope :: 4",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
@@ -43,13 +53,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=install_requires,
-    extras_require={
-        'test': [
-            'mock',
-            'mechanize==0.2.5',
-            'wsgi_intercept==0.4',
-            'cssselect',
-            'webob',
-        ]
-    },
+    extras_require={"test": TEST_REQUIRES},
+    entry_points="""
+      # -*- Entry points: -*-
+      [z3c.autoinclude.plugin]
+      target = plone
+      """,
 )

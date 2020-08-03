@@ -1,5 +1,6 @@
 from os import path
 from Products.ZSPARQLMethod.Method import sparql
+import six
 
 GET_LANGS = """\
 SELECT ?lang_url WHERE {
@@ -51,7 +52,15 @@ class MockResponse(object):
 
 class MockQuery(sparql._Query):
     def _get_response(self, opener, request, buf, timeout):
-        self.querystring = request.get_data()
+        if six.PY2:
+            self.querystring = request.get_data()
+        else:
+            if not request.data:
+                self.querystring = request.selector.split('?')[1]
+            else:
+                self.querystring = request.data
+            if isinstance(self.querystring, six.binary_type):
+                self.querystring = self.querystring.decode("utf-8")
         return MockResponse()
 
     def _read_response(self, response, buf, timeout):
@@ -61,6 +70,7 @@ class MockQuery(sparql._Query):
             from cgi import parse_qs
         query = parse_qs(self.querystring).get('query', [''])[0]
         buf.write(QUERIES[pack(query)])
+
 
 class MockSparql(object):
     def start(self):

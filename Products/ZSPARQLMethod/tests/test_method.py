@@ -1,7 +1,8 @@
 import unittest
 from mock import Mock, patch
-import mock_db
+import Products.ZSPARQLMethod.tests.mock_db as mock_db
 
+import six
 import sparql
 
 from Products.ZSPARQLMethod.Method import QueryTimeout
@@ -53,7 +54,7 @@ class QueryTest(unittest.TestCase):
 
         result = self.method.execute()
         if QueryTimeout.__name__ not in result['exception']:
-            raise self.failureException, "%s not raised" % QueryTimeout.__name__
+            raise self.failureException("%s not raised" % QueryTimeout.__name__)
 
     @patch('Products.ZSPARQLMethod.Method.sparql')
     def test_error(self, mock_sparql):
@@ -63,7 +64,7 @@ class QueryTest(unittest.TestCase):
 
         result = self.method.execute()
         if MyError.__name__ not in result['exception']:
-            raise self.failureException, "%s not raised" % MyError.__name__
+            raise self.failureException("%s not raised" % MyError.__name__)
 
     def test_query_with_arguments(self):
         self.method.query = mock_db.GET_LANG_BY_NAME
@@ -85,8 +86,12 @@ class MapArgumentsTest(unittest.TestCase):
         missing, result = map_arg_values(parse_arg_spec(raw_arg_spec), arg_data)
         self.assertEqual(missing, [])
         self.assertEqual(result, expected)
-        self.assertEqual(map(type, result.values()),
-                         map(type, expected.values()))
+        if six.PY2:
+            self.assertEqual(map(type, result.values()),
+                             map(type, expected.values()))
+        else:
+            self.assertEqual(set(map(type, result.values())),
+                             set(map(type, expected.values())))
 
     def test_map_zero(self):
         self._test(u'', (), {})
@@ -210,7 +215,10 @@ class ResultsUnpackingTest(unittest.TestCase):
 
     def test_iter(self):
         result = self.do_query([ [sparql.Literal("hello")] ])
-        self.assertEqual(iter(result).next()[0], "hello")
+        if six.PY2:
+            self.assertEqual(iter(result).next()[0], "hello")
+        else:
+            self.assertEqual(next(iter(result))[0], "hello")
 
     def test_length(self):
         result = self.do_query([

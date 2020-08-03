@@ -1,11 +1,13 @@
 from time import time
 from datetime import datetime
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from App.class_init import InitializeClass
 from AccessControl import ClassSecurityInfo
 from AccessControl.Permissions import view, view_management_screens
 from OFS.SimpleItem import SimpleItem
 from OFS.Cache import Cacheable
+from sparql import SparqlException
 import DateTime
 import sparql
 
@@ -26,6 +28,8 @@ sparql_converters = {
 
 
 manage_addZSPARQLMethod_html = PageTemplateFile('zpt/method_add.zpt', globals())
+template_add_SPARQL = ViewPageTemplateFile('zpt/method_add.zpt', globals())
+
 
 def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     """ Create a new ZSPARQLMethod """
@@ -36,6 +40,7 @@ def manage_addZSPARQLMethod(parent, id, title, endpoint_url="", REQUEST=None):
     parent._setObject(id, ob)
     if REQUEST is not None:
         REQUEST.RESPONSE.redirect(parent.absolute_url() + '/manage_workspace')
+
 
 class ZSPARQLMethod(SimpleItem, Cacheable):
     """
@@ -58,7 +63,7 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
 
     icon = 'misc_/ZSPARQLMethod/method.gif'
 
-    def __init__(self, id, title, endpoint_url):
+    def __init__(self, id, title, endpoint_url, request=None, context=None):
         super(ZSPARQLMethod, self).__init__()
         self._setId(id)
         self.title = title
@@ -66,9 +71,12 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         self.timeout = None
         self.arg_spec = ""
         self.query = ""
+        self.request = request
+        self.context = context
 
     security.declareProtected(view_management_screens, 'manage_edit_html')
     manage_edit_html = PageTemplateFile('zpt/method_edit.zpt', globals())
+    template_edit = ViewPageTemplateFile('zpt/method_edit.zpt', globals())
 
     security.declareProtected(view_management_screens, 'manage_edit')
     def manage_edit(self, REQUEST):
@@ -114,6 +122,7 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
         return result
 
     _test_html = PageTemplateFile('zpt/method_test.zpt', globals())
+    _test_template = ViewPageTemplateFile('zpt/method_test.zpt', globals())
 
     def index_html(self, REQUEST=None, **kwargs):
         """
@@ -123,11 +132,20 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
 
         Response will be JSON, with values encoded as strings in N3 format.
         """
-
         if REQUEST is not None:
             kwargs.update(REQUEST.form)
 
+        # TODO: the tests from test_browser.py need to be fixed
+        # if REQUEST.base == 'http://test':
+        #     from Products.ZSPARQLMethod.tests.test_browser import HEADERS
+        #     for key in HEADERS.keys():
+        #         if REQUEST.getHeader(key):
+        #             kwargs.update({key: REQUEST.getHeader(key)})
+        #     REQUEST.form.update(kwargs)
+        #     return self.test_html(REQUEST)
+
         arg_values = self.map_arguments(**kwargs)
+
         result = self.execute(**arg_values)
 
         if REQUEST is not None:
@@ -175,7 +193,8 @@ class ZSPARQLMethod(SimpleItem, Cacheable):
             'arg_spec': arg_spec,
             'error': error,
         }
-        return self._test_html(REQUEST, **options)
+        self.request = REQUEST
+        return self._test_template(REQUEST, **options)
 
     # __call__ requires the "View" permission, see __ac_permissions__ above.
     def __call__(self, **kwargs):
@@ -253,6 +272,7 @@ class MethodResult(object):
 
 import traceback
 
+
 def run_with_timeout(timeout, func, *args, **kwargs):
     """
     Run the given callable in a separate thread; if it does not return within
@@ -265,7 +285,7 @@ def run_with_timeout(timeout, func, *args, **kwargs):
     result = {}
     try:
         ret = func(*args, **kwargs)
-    except sparql.SparqlException as err:
+    except SparqlException as err:
         if err.code == 28:
             raise QueryTimeout
         result['exception'] = "Query timeout. " + err.message
@@ -290,6 +310,7 @@ RDF_TERM_FACTORY = {
     'time':     lambda v: sparql.Literal(v, sparql.XSD_TIME),
     'boolean':  lambda v: sparql.Literal(v, sparql.XSD_BOOLEAN),
 }
+
 
 def parse_arg_spec(raw_arg_spec):
     """
@@ -321,6 +342,7 @@ def parse_arg_spec(raw_arg_spec):
         arg_spec[str(name)] = factory
     return arg_spec
 
+
 def map_arg_values(arg_spec, arg_data):
     """
     Box all values in `arg_data` according to `arg_spec`. Returns a tuple
@@ -335,6 +357,7 @@ def map_arg_values(arg_spec, arg_data):
             missing.append(name)
 
     return missing, arg_values
+
 
 def interpolate_query(query_spec, var_data):
     """
@@ -353,8 +376,10 @@ def interpolate_query(query_spec, var_data):
     var_strings = dict( (k, v.n3()) for (k, v) in var_data.items() )
     return Template(query_spec).substitute(**var_strings)
 
+
 def html_quote(s):
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
 
 def interpolate_query_html(query_spec, var_data):
     """
@@ -385,6 +410,7 @@ def interpolate_query_html(query_spec, var_data):
             tmpl._invalid(mo)
         raise ValueError('Unrecognized named group in pattern', tmpl.pattern)
     return tmpl.pattern.sub(convert, tmpl.template)
+
 
 def rdf_values_to_json(value):
     if isinstance(value, sparql.RDFTerm):
