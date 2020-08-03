@@ -1,4 +1,4 @@
-#XXXX TODO: the tests from test_browser.py need to be fixed
+#TODO: the tests from test_browser.py need to be fixed
 
 import unittest
 from mock import patch
