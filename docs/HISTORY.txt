@@ -1,7 +1,14 @@
 Changelog
 =========
 
-2.2-dev0 - (unreleased)
+2.3 - (2020-08-05)
+---------------------------
+* Change: Triggered dummy release
+  [alecghica]
+* Change: triggered dummy release
+  [alecghica refs #118147]
+
+2.2 - (2020-08-05)
 ---------------------------
 * Feature: fixed unittest on Python3
   [alecghica refs #111217]
